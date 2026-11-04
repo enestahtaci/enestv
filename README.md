@@ -1,25 +1,27 @@
+[English](README.md) | [Türkçe](README.tr.md)
+
 # enestv
 
-## Lisans ve içerik
+## License and content
 
 Copyright (c) 2026 enestv katkıcıları.
-enestv, GNU General Public License sürüm 3 veya (tercihinize bağlı olarak) sonraki sürümleri altında sunulur: **GPL-3.0-or-later**. Tam metin: [LICENSE](LICENSE). Üçüncü taraf lisansları ayrı korunur: [bildirimler](THIRD-PARTY-NOTICES.md).
-Katkıcı onayları proje sahibi tarafından alınır; bu metin onayların tamamlandığı beyanı değildir.
+enestv is provided under the GNU General Public License version 3 or (at your option) any later version: **GPL-3.0-or-later**. Full text: [LICENSE](LICENSE). Third-party licenses are preserved separately: [notices](THIRD-PARTY-NOTICES.md).
+Contributor approvals are obtained by the project owner; this text is not a statement that those approvals have been completed.
 
-enestv yayın, playlist, film/dizi, EPG veya hesap sağlamaz. Kullanıcı erişim hakkı olduğu kaynakları ekler. Yayıncılar veya VideoLAN ile bağlantısı, ortaklığı ya da onay ilişkisi yoktur.
+enestv does not provide any streams, playlists, movies/series, EPG data or accounts. Users add sources they have the right to access. It is not affiliated with, partnered with or endorsed by VideoLAN or any broadcaster.
 
-**HTTP kaynakları:** HTTP adreslerinde kullanıcı adı, parola, playlist ve yayın istekleri ağ üzerinden şifrelenmeden iletilebilir. Mümkünse HTTPS kullanın. Yerel DPAPI koruması ağ trafiğini şifrelemez.
+**HTTP sources:** When using HTTP addresses, usernames, passwords, playlists and stream requests may be transmitted over the network without encryption. Use HTTPS where possible. Local DPAPI protection does not encrypt network traffic.
 
-## Kaynak kodu ve üçüncü taraf kaynak arşivleri
+## Source code and third-party source archives
 
-[enestv kaynak deposu](https://github.com/enestahtaci/enestv) ve ilgili sürüm tag'i uygulama kodunu içerir. Her GitHub Release, aynı sürümün enestv kaynak arşivini, üçüncü taraf kaynaklarını, gerekli yamaları/build reçetelerini ve SHA256SUMS.txt dosyasını içermelidir.
-[Tam resmi indirme adresleri, FFmpeg contrib yama/ayar incelemesi ve açık doğrulamalar](SOURCE-ACCESS.md).
-[GitHub Releases](https://github.com/enestahtaci/enestv/releases). Bu adresler yayın için belirlenmiştir; depo henüz oluşturulmamıştır ve adreslerin erişilebilirliği doğrulanmış değildir. Açık native kaynak doğrulamaları tamamlanmadan Release hazır sayılmaz.
+The [enestv source repository](https://github.com/enestahtaci/enestv) and the corresponding version tag contain the application code. Each GitHub Release must include the enestv source archive for that version, third-party sources, required patches/build recipes and SHA256SUMS.txt.
+[Full official download URLs, FFmpeg contrib patch/configuration review and outstanding verification items](SOURCE-ACCESS.md).
+[GitHub Releases](https://github.com/enestahtaci/enestv/releases). These addresses have been designated for publication; the repository has not yet been created and their availability has not been verified. A Release is not ready until the outstanding native source verification items have been resolved.
 
-## Derleme ve kurulum paketi üretimi
+## Building the application and installer
 
-Bu sürüm .NET 8 hedefler; .NET 10 geçişi ayrı iştir. .NET 8 desteği 10 Kasım 2026'da biter; bakım buna göre planlanmalıdır.
-Windows 11 x64 ve .NET 8 SDK ile depo kökünde:
+This version targets .NET 8; migration to .NET 10 is a separate task. .NET 8 support ends on November 10, 2026; maintenance should be planned accordingly.
+On Windows 11 x64 with the .NET 8 SDK, run from the repository root:
 
 ```powershell
 dotnet restore enestv.sln
@@ -27,103 +29,103 @@ dotnet build enestv.sln -c Release
 dotnet test EnesTV.Tests -c Release
 ```
 
-Kurulum için Inno Setup gerekir. `Installer/Build-Setup.ps1` betiğine `-InnoCompiler` ile kurulu ISCC.exe yolunu verin. Betik bağımsız x64 publish ve installer üretimini yürütür; taze staging dizini kullanır.
-Bu komutlar dokümantasyondur; Aşama 2 hazırlığında çalıştırılmadı. [Release kontrol listesi](RELEASE-CHECKLIST.md).
+Inno Setup is required to build the installer. Pass the installed ISCC.exe path to `Installer/Build-Setup.ps1` using `-InnoCompiler`. The script publishes a self-contained x64 application and builds the installer using a fresh staging directory.
+These commands are documentation; they were not run during Stage 2 preparation. [Release checklist](RELEASE-CHECKLIST.md).
 
-### 1.3.0 — arayüz ve kullanım düzenlemeleri
+### 1.3.0 — interface and usability improvements
 
-`enestv-Setup-1.3.0-x64.exe` ile güncelleyin. Önce açık enestv'yi kapatın. Mevcut hesaplar, favoriler, geçmiş ve izleme konumları korunur; bu sürüm veritabanı şemasını değiştirmez.
+Update using `enestv-Setup-1.3.0-x64.exe`. Close any running instance of enestv first. Existing accounts, favorites, history and playback positions are preserved; this version does not change the database schema.
 
-- Menü Türkçeleştirildi, vektör simgeler ve seçili bölüm görünümü yenilendi.
-- Kanal satırları sadeleşti. İlk açılış, boş favoriler/geçmiş, yükleme ve sonuçsuz arama ayrı açıklamalar gösterir; arama/filtre tek düğmeyle temizlenir.
-- Oynat/duraklat düğmesi belirginleştirildi ve simgesi oynatma durumuna bağlandı. **Görüntü, ses ve altyazı** bölümünü açarak ek oynatma seçeneklerine erişin. Film/dizi ekranında bu bölüm **Ses ve altyazı** adındadır.
-- Yayın hataları video üzerinde açıklama ve **Yeniden dene** düğmesiyle gösterilir.
-- Film detayları kullanılmayan bölüm sütununu kaplar. Bölüm seçenekleri yalnızca dizilerde görünür. Hesap bulunmaması ve boş katalog durumları açıklanır.
-- Ayarlar kartlara ayrıldı. Kaynak ekleme formu seçilen türe göre açıklama gösterir; kısa pencerede alanlar kaydırılır, kaydet düğmesi görünür kalır.
-- Giriş alanları, onay kutuları, ses/ilerleme çubukları ve odak/seçim görünümü koyu ve açık temada ortak tasarımı kullanır.
+- The menu was localized into Turkish, with updated vector icons and selected-section styling.
+- Channel rows were simplified. First launch, empty favorites/history, loading and searches with no results have separate explanations; search/filter can be cleared with one button.
+- The play/pause button is more prominent and its icon reflects playback state. Open **Görüntü, ses ve altyazı** (Picture, audio and subtitles) for additional playback options. On the movies/series screen, this section is called **Ses ve altyazı** (Audio and subtitles).
+- Stream errors appear over the video with an explanation and a **Yeniden dene** (Retry) button.
+- Movie details use the space otherwise occupied by the episode column. Episode options appear only for series. Missing accounts and empty catalogs are explained.
+- Settings are arranged in cards. The add-source form explains the selected source type; fields scroll in short windows while the save button remains visible.
+- Input fields, checkboxes, volume/progress sliders and focus/selection styling share a consistent design in dark and light themes.
 
-10.000 kanallı liste, gerçek VLC oynatımı, tam ekran, küçük pencere, klavye kısayolları ve film/dizi akışları yeniden kontrol edildi. Ayrıntılar `UI-DESIGN.md` ve `VERIFICATION-1.3.0.md` dosyalarındadır. Tek Setup EXE paylaşılabilir; .NET ve VLC pakete dahildir. Kurulum kişisel hesap içermez.
+A 10,000-channel list, real VLC playback, fullscreen, small windows, keyboard shortcuts and movie/series flows were checked again. Details are in `UI-DESIGN.md` and `VERIFICATION-1.3.0.md`. A single Setup EXE can be shared; .NET and VLC are included. The installer contains no personal account.
 
-### 1.2.0 — filmler, diziler ve kaldığın yerden devam
+### 1.2.0 — movies, series and resume playback
 
-`enestv-Setup-1.2.0-x64.exe` ile güncelleyin. Ana menüye **Filmler** ve **Diziler** eklendi. Bu kataloglar, kaynağı **Xtream Codes** olarak eklenmiş hesabınızdan alınır. Yalnızca M3U kullananlar için sunucu URL'si, kullanıcı adı ve parola ile bir Xtream kaynağı eklemek gerekir; sağlayıcının hesabınızda film/dizi erişimi sunması gerekir.
+Update using `enestv-Setup-1.2.0-x64.exe`. **Filmler** (Movies) and **Diziler** (Series) were added to the main menu. These catalogs come from an account added as an **Xtream Codes** source. Users who only use M3U need to add an Xtream source with a server URL, username and password; the provider must enable movie/series access for the account.
 
-1. Ana menüde **Filmler** veya **Diziler** seçin. Sol üstten Xtream hesabını değiştirin.
-2. Kategoriden filtreleyin veya ada göre arayın. Bir içeriği seçerek açıklamasını açın.
-3. Dizilerde sezon ve bölüm seçin; **İzle / devam et** düğmesine basın.
-4. Süre çubuğunu kullanın veya **−10 sn / +10 sn** ile sarın. Oynatıcı odaktayken Space duraklatır, sol/sağ 10 saniye sarar, yukarı/aşağı sesi değiştirir, M sessize alır.
-5. Konum yaklaşık 5 saniyede bir ve durdurma/içerik değiştirme/pencereyi kapatma sırasında kaydedilir. **Baştan başlat** kayıtlı konumu kullanmaz. İzlenen bölüm işaretlenir; dizi yeniden seçildiğinde son izlenen bölüm, tamamlanmışsa sonraki bölüm seçilir.
-6. **Sonraki bölüm** aynı sezonun sonraki bölümüne, sezon bittiyse sonraki sezona geçer. Bölümler kendiliğinden oynatılmaz; düğmeye basmak gerekir.
-7. F11 ile tam ekran; Esc ile çıkış. Süre, ses ve oynatma kontrolleri fare hareketinde görünür, kullanılmadığında gizlenir. **Canlı TV'ye dön** katalog penceresini kapatır.
+1. Select **Filmler** or **Diziler** in the main menu. Switch the Xtream account at the top left.
+2. Filter by category or search by name. Select an item to open its description.
+3. For series, select a season and episode, then press **İzle / devam et** (Watch / resume).
+4. Use the progress bar or **−10 sn / +10 sn** to seek. While the player has focus, Space pauses, left/right seeks 10 seconds, up/down adjusts volume and M mutes.
+5. The position is saved approximately every 5 seconds and when stopping, switching content or closing the window. **Baştan başlat** (Start over) ignores the saved position. Watched episodes are marked; selecting a series again selects the last watched episode, or the next episode if it was completed.
+6. **Sonraki bölüm** (Next episode) moves to the next episode in the same season, or to the next season when the season ends. Episodes do not play automatically; the button must be pressed.
+7. F11 enters fullscreen; Esc exits. Progress, volume and playback controls appear on mouse movement and hide when unused. **Canlı TV'ye dön** (Return to Live TV) closes the catalog window.
 
-Canlı TV, film/dizi ekranı açılırken durdurulur; iki yayın aynı anda oynatılmaz. Geri dönünce bir kanal seçerek yeniden başlatabilirsiniz. Mevcut genel favoriler/kanal düzeni canlı TV içindir.
+Live TV stops when the movie/series screen opens; two streams are not played simultaneously. After returning, select a channel to restart playback. Existing general favorites and channel organization apply to Live TV.
 
-Kataloglar ilk açılışta indirilir, şifreli SQLite önbelleğinde tutulur ve 6 saatten eskiyse yeniden alınır. **↻** ile elle yenilenebilir; başarısız yenileme son başarılı kataloğu silmez. Bölüm ayrıntıları seçildiğinde sunucudan alınır. Ağ olmadan katalog görülebilir; içerik oynatımı için bağlantı gerekir.
+Catalogs are downloaded on first use, kept in an encrypted SQLite cache and refreshed when more than 6 hours old. Use **↻** to refresh manually; a failed refresh does not erase the last successful catalog. Episode details are fetched from the server when selected. The catalog can be viewed offline; playback requires a connection.
 
-Şema 1 veya 2 kayıtları veriler silinmeden sürüm 3'e yükseltilir. Hesap, favori, geçmiş ve kanal düzeni korunur. Yeni katalog/izleme konumu verileri de DPAPI ile şifrelenir. Yeni veritabanını eski uygulama sürümüyle açmak desteklenmez. Kurulum kişisel hesap veya hazır içerik içermez.
+Schema 1 or 2 records are upgraded to version 3 without deleting data. Accounts, favorites, history and channel organization are preserved. New catalog/playback-position data is also encrypted with DPAPI. Opening the new database with an older application version is unsupported. The installer contains no personal account or bundled content.
 
-Doğrulama ayrıntıları `VERIFICATION-1.2.0.md` dosyasındadır. Yeni test akışı: `dotnet run --project EnesTV.Smoke -c Release -- --vod ./test-results/vod`.
-
-
-### 1.1.0 — tam ekran kontrolleri, kanal geçişi ve kanal düzeni
-
-`enestv-Setup-1.1.0-x64.exe` önceki kurulumun üzerine kurulabilir. Önce çalışan enestv'yi kapatın. Hesaplar, kaynaklar, genel favoriler ve geçmiş korunur; yeni düzen verileri için veritabanı otomatik olarak sürüm 2'ye yükselir.
-
-- **Tam ekran:** F11 veya tam ekran düğmesi. Fare hareketinde görünen alt kontrol çubuğu, hareketsiz kalınca 3 saniyede gizlenir; fare çubuğun üzerindeyken veya bir kontrol sürüklenirken açık kalır. Kanal/EPG bilgi panelleri gizli kalır. Esc ile çıkılır.
-- **Kanal geçişi:** Önceki, sonraki ve son izlenen kanala dön düğmeleri. Önceki/sonraki mevcut arama, kategori veya favori listesini takip eder ve listenin sonundan başına döner. Son izlenen düğmesi iki kanal arasında geçiş yapar.
-- **Kanal numarası:** Listede görünen numarayı yazın; Enter'a basın veya 1,2 saniye bekleyin. Numara, arama/favori filtresinden bağımsız tüm görünür kanalların sırasını kullanır. Düzeni veya gizli kanalları değiştirince numaralar yeniden belirlenir. Metin alanına yazarken kanal kısayolları çalışmaz.
-- **Kısayollar:** Sol menüde Kısayollar ekranından yeniden atama ve varsayılanlara dönüş. Varsayılanlar: PageDown sonraki, PageUp önceki, Backspace son kanal, Space duraklat/oynat, M sessiz, yukarı/aşağı ses. F11, Esc ve rakamlar sabittir. Çakışan kısayollar kaydedilmez.
-- **Kanal düzeni:** Sol menüden açılır. Kategorileri/kanalları gizleyin, görünen adı düzenleyin, yukarı/aşağı taşıyın veya A–Z sıralayın. Boş görünen ad sağlayıcının adını kullanır. Kaydet tüm değişiklikleri uygular; Vazgeç değişiklikleri atar.
-- **Özel favori listeleri:** Kanal düzeninde liste oluşturun, adını değiştirin veya silin. Ctrl/Shift ile seçilen kanalları ekleyip çıkarın. Ana ekranda Favoriler bölümündeki açılır menüden liste seçilir. Genel yıldızlı favoriler ayrı tutulur. Özel bir listede yıldıza basmak kanalı yalnızca o listeden çıkarır.
-- Kanal düzeni, özel listeler ve kısayollar SQLite içinde DPAPI ile şifrelenerek tutulur. Liste yenilemesi aynı kimliğe sahip kanalların düzenini korur. Sağlayıcının kanal kimliğini değiştirmesi bu eşleştirmeyi bozabilir.
-
-Kurulum tek EXE olarak paylaşılabilir; içinde .NET ve LibVLC bulunur. Önceki sürümdeki ikon ve işlevsiz “enes'e teşekkür et” kutucuğu korunmuştur. Ayrıntılı kontrol sonuçları `VERIFICATION-1.1.0.md` dosyasındadır.
+Verification details are in `VERIFICATION-1.2.0.md`. New test flow: `dotnet run --project EnesTV.Smoke -c Release -- --vod ./test-results/vod`.
 
 
-### 1.0.2 — Windows kurulumu ve ikon
+### 1.1.0 — fullscreen controls, channel switching and channel organization
 
-`enestv-Setup-1.0.2-x64.exe` ile kurulum yapılabilir. Türkçe sihirbaz uygulamayı varsayılan olarak `%LOCALAPPDATA%\Programs\enestv` konumuna, yönetici izni gerektirmeden kurar. Başlat menüsü kısayolu oluşturur; masaüstü kısayolu isteğe bağlıdır. .NET ve LibVLC dahildir. Windows Ayarlar → Uygulamalar üzerinden kaldırılabilir; playlist/hesap/ayar verileri `%LOCALAPPDATA%\enestv` içinde korunur.
+`enestv-Setup-1.1.0-x64.exe` can be installed over the previous installation. Close any running instance of enestv first. Accounts, sources, general favorites and history are preserved; the database is automatically upgraded to version 2 for the new organization data.
 
-Son sayfada isteğe bağlı “enestv'yi şimdi aç” seçeneği ve yalnızca şaka amaçlı **“enes'e teşekkür et”** kutucuğu vardır. Teşekkür kutucuğunun hiçbir olay işleyicisi, komutu, ağ isteği veya kalıcı kaydı yoktur.
+- **Fullscreen:** F11 or the fullscreen button. The bottom control bar appears on mouse movement and hides after 3 seconds of inactivity; it stays visible while the pointer is over it or a control is being dragged. Channel/EPG information panels remain hidden. Esc exits.
+- **Channel switching:** Previous, next and return-to-last-channel buttons. Previous/next follows the current search, category or favorites list and wraps around at the end. The last-channel button switches between two channels.
+- **Channel number:** Type the number displayed in the list, then press Enter or wait 1.2 seconds. Numbers use the order of all visible channels, independently of search/favorites filters. Changing organization or hidden channels recalculates the numbers. Channel shortcuts do not run while typing in a text field.
+- **Shortcuts:** Reassign shortcuts or restore defaults on the Kısayollar (Shortcuts) screen in the left menu. Defaults: PageDown next, PageUp previous, Backspace last channel, Space play/pause, M mute, up/down volume. F11, Esc and digits are fixed. Conflicting shortcuts cannot be saved.
+- **Channel organization:** Open from the left menu. Hide categories/channels, edit display names, move up/down or sort A–Z. An empty display name uses the provider's name. Save applies all changes; Cancel discards them.
+- **Custom favorites lists:** Create, rename or delete lists in channel organization. Add or remove channels selected with Ctrl/Shift. On the main screen, select a list from the Favorites dropdown. General starred favorites remain separate. Clicking the star in a custom list removes the channel only from that list.
+- Channel organization, custom lists and shortcuts are stored in SQLite encrypted with DPAPI. Refreshing a playlist preserves organization for channels with the same identity. A provider changing channel identifiers may break this matching.
 
-Yeni ikon Windows EXE kaynaklarına, uygulama pencerelerine, Setup/kaldırıcıya ve kısayollara eklendi. PNG/ICO kaynakları `EnesTV.App/Assets` içindedir. Setup kod imzası içermez.
+The installer can be shared as a single EXE; it includes .NET and LibVLC. The icon and nonfunctional “enes'e teşekkür et” checkbox from the previous version are preserved. Detailed results are in `VERIFICATION-1.1.0.md`.
 
-Kurulumu yeniden derlemek için .NET 8 SDK ve Inno Setup 6.7.3 veya üzeri gerekir:
+
+### 1.0.2 — Windows installer and icon
+
+Install using `enestv-Setup-1.0.2-x64.exe`. The Turkish wizard installs the application to `%LOCALAPPDATA%\Programs\enestv` by default without administrator permission. It creates a Start menu shortcut; a desktop shortcut is optional. .NET and LibVLC are included. Uninstall through Windows Settings → Apps; playlist/account/settings data is preserved in `%LOCALAPPDATA%\enestv`.
+
+The final page has an optional “enestv'yi şimdi aç” (Launch enestv now) option and a joke-only **“enes'e teşekkür et”** (Thank Enes) checkbox. The thank-you checkbox has no event handler, command, network request or persistent record.
+
+The new icon was added to Windows EXE resources, application windows, Setup/uninstaller and shortcuts. PNG/ICO assets are in `EnesTV.App/Assets`. Setup is not code-signed.
+
+Rebuilding the installer requires the .NET 8 SDK and Inno Setup 6.7.3 or later:
 
 ```powershell
 ./Installer/Build-Setup.ps1 -InnoCompiler 'C:\Path\To\Inno Setup 6\ISCC.exe'
 ```
 
-Script bağımsız x64 uygulamayı publish eder, lisans dosyalarını kopyalar ve `dist` altında Setup oluşturur. Dağıtım/ticari kullanımda Inno Setup'ın lisans koşullarını dikkate alın: https://jrsoftware.org/isinfo.php
+The script publishes the self-contained x64 application, copies license files and creates Setup under `dist`. Observe Inno Setup's license terms for distribution/commercial use: https://jrsoftware.org/isinfo.php
 
-### 1.0.1 — pencere ve tam ekran düzeltmeleri
+### 1.0.1 — window and fullscreen fixes
 
-Windows başlık çubuğu, yazısı ve çerçevesi artık seçili koyu/açık temayla eşleşir. Tam ekran düğmesi veya F11 yalnızca videoyu, görev çubuğu alanı dahil tüm monitörde gösterir; kanal bilgisi, EPG, kontroller ve kenar boşlukları gizlenir. Esc veya F11 önceki normal/büyütülmüş pencere düzenini geri getirir. Video en-boy oranı ayarı korunur.
+The Windows title bar, text and border now match the selected dark/light theme. The fullscreen button or F11 displays only the video across the entire monitor, including the taskbar area; channel information, EPG, controls and margins are hidden. Esc or F11 restores the previous normal/maximized window layout. The video aspect ratio setting is preserved.
 
-Windows 11 x64 için C# / .NET 8 / WPF IPTV masaüstü uygulaması. Kullanıcının kendi yasal kaynaklarını oynatır. Uygulama ile birlikte sağlayıcı, hazır kanal listesi veya yayın hesabı verilmez.
+A C# / .NET 8 / WPF IPTV desktop application for Windows 11 x64. It plays the user's own legal sources. No provider, preloaded channel list or streaming account is supplied with the application.
 
-## Hızlı başlangıç
+## Quick start
 
-Hazır `enestv-win-x64` klasöründeki **enestv.exe** dosyasını açın. Dağıtım .NET çalışma zamanını ve LibVLC'yi içerir; ayrı .NET veya VLC kurulumu gerekmez. ZIP kullanıyorsanız önce tamamını çıkartın. EXE'yi klasördeki DLL ve `libvlc` dizininden ayırmayın.
+Open **enestv.exe** in the prepared `enestv-win-x64` folder. The distribution includes the .NET runtime and LibVLC; no separate .NET or VLC installation is required. If using a ZIP, extract it completely first. Keep the EXE together with the DLL files and `libvlc` directory.
 
-1. **Kaynak ekle → M3U URL** seçin, kaynak adı ve kendi playlist adresinizi girin.
-2. Liste indirilir, kategoriler oluşturulur ve son başarılı sonuç kaydedilir.
-3. Kanal satırına tıklayın. Yıldız düğmesi favoriyi değiştirir.
-4. **Ayarlar** içinde kaynakları düzenleyin, yeniden adlandırın, yenileyin veya silin.
-5. XMLTV adresini Ayarlar'a yazıp **Kaydet ve rehberi güncelle** seçin. Xtream hesaplarının XMLTV adresi otomatik oluşturulur; aynı düğmeyle güncellenir.
+1. Select **Kaynak ekle → M3U URL** (Add source → M3U URL), enter a source name and your own playlist address.
+2. The playlist is downloaded, categories are created and the last successful result is saved.
+3. Click a channel row. The star button toggles its favorite status.
+4. In **Ayarlar** (Settings), edit, rename, refresh or delete sources.
+5. Enter an XMLTV address in Settings and select **Kaydet ve rehberi güncelle** (Save and update guide). XMLTV addresses for Xtream accounts are generated automatically; update them with the same button.
 
-**Dosya aç** `.m3u` ve `.m3u8` kanal listelerini alır. Xtream için Kaynak ekle menüsünde **Xtream Codes**, sunucu, kullanıcı adı ve parola alanlarını kullanın.
+**Dosya aç** (Open file) imports `.m3u` and `.m3u8` channel lists. For Xtream, select **Xtream Codes** in the Add source menu and use the server, username and password fields.
 
-## Geliştirme gereksinimleri
+## Development requirements
 
 - Windows 11 x64
-- .NET 8 SDK (geliştirme sırasında 8.0.425 kullanıldı)
-- İlk paket geri yüklemesinde NuGet erişimi
-- İsteğe bağlı Visual Studio 2022, .NET masaüstü geliştirme iş yükü
+- .NET 8 SDK (8.0.425 was used during development)
+- NuGet access for the initial package restore
+- Optional: Visual Studio 2022 with the .NET desktop development workload
 
-## Derleme ve çalıştırma
+## Build and run
 
-Kaynak kodu paketindeki enestv.sln dosyasının bulunduğu dizinden:
+From the directory containing enestv.sln in the source package:
 
 ```powershell
 dotnet restore enestv.sln
@@ -132,63 +134,63 @@ dotnet test EnesTV.Tests -c Release
 dotnet run --project EnesTV.App -c Release
 ```
 
-Bağımsız Windows dağıtımı:
+Self-contained Windows distribution:
 
 ```powershell
 dotnet publish EnesTV.App -c Release -r win-x64 --self-contained true -o dist/enestv-win-x64
 ```
 
-`Directory.Build.props` x64 hedefini ve compiler uyarılarının hata sayılmasını ayarlar. Trim ve single-file kullanılmaz; LibVLC'nin değiştirilebilir DLL/plugin dosyaları korunur. Üçüncü taraf bildirimlerini dağıtıma ekleyin.
+`Directory.Build.props` sets the x64 target and treats compiler warnings as errors. Trimming and single-file publishing are not used; LibVLC's replaceable DLL/plugin files are preserved. Include third-party notices in the distribution.
 
-## Mimari
+## Architecture
 
 ```text
 EnesTV.Core/
-  Models/       Kanal, kaynak, program ve ayar kayıtları
-  Services/     HttpClient, M3U, Xtream, XMLTV, filtre, DPAPI, dönen log
-  Data/         SQLite sorguları, işlemler, EPG cache, şema sürümleme
+  Models/       Channel, source, program and settings records
+  Services/     HttpClient, M3U, Xtream, XMLTV, filtering, DPAPI, rotating logs
+  Data/         SQLite queries, transactions, EPG cache, schema versioning
 EnesTV.App/
-  ViewModels/   MVVM durumu ve asenkron komutlar
-  Views/        Kaynak, ayarlar ve TV rehberi pencereleri; stiller
-  Services/     Sınırlı eşzamanlı/asenkron logo önbelleği
-  Playback/     LibVLC yaşam döngüsü ve bağlantı durumları
-EnesTV.Tests/   Parser, normalizasyon, filtre, saat, kalıcılık testleri
-EnesTV.Smoke/   Yerel HTTP sunucusu, sentetik medya ve entegrasyon testleri
+  ViewModels/   MVVM state and asynchronous commands
+  Views/        Source, settings and TV guide windows; styles
+  Services/     Logo cache with bounded concurrency and asynchronous loading
+  Playback/     LibVLC lifecycle and connection states
+EnesTV.Tests/   Parser, normalization, filtering, time and persistence tests
+EnesTV.Smoke/   Local HTTP server, synthetic media and integration tests
 ```
 
-SQLite `PRAGMA user_version=3` ile sürümlenir; sürüm 1/2 kayıtları mevcut veriler silinmeden yükseltilir; ilk kurulum bir transaction içinde yapılır. Gelecek migration'lar `LibraryStore.InitializeAsync` içinde sırayla eklenir. Bilinmeyen ileri şema sürümleri üzerine yazılmaz. Her bağlantı işlem sonunda kapanır; bulk işlemler UI thread'inden ayrıdır.
+SQLite is versioned using `PRAGMA user_version=3`; version 1/2 records are upgraded without deleting existing data, and initial setup runs in a transaction. Future migrations are added sequentially in `LibraryStore.InitializeAsync`. Unknown newer schema versions are not overwritten. Each connection closes after its operation; bulk operations run off the UI thread.
 
-## Özellikler ve uygulama davranışı
+## Features and application behavior
 
-- Birden fazla yerel/uzak M3U ve Xtream kaynağı; ekle, düzenle, ad değiştir, sil, manuel yenile, son güncelleme zamanı.
-- `tvg-id`, `tvg-name`, `tvg-logo`, `group-title`; eksik kategori `Uncategorized`; bozuk metadata'ya dayanıklı ayrıştırma; tam tekrarları eleme.
-- UTF-8/BOM, UTF-16 BOM; UTF-8 çözülemezse Windows-1254 geri dönüşü.
-- Ad ve kategori üzerinde büyük/küçük harf duyarsız, 180 ms gecikmeli arama; sanallaştırılan ve geri dönüştürülen kanal satırları.
-- Logolar yalnızca görünür satırlarda yüklenir; 4 eşzamanlı indirme, en fazla 200 bellek ve 500 disk girdisi, 7 gün cache ömrü, 4 MB dosya sınırı. Bozuk logo için TV simgesi.
-- Oynat/duraklat, durdur, ses düzeyi, sessiz, tam ekran, görüntü oranı, mevcut ses ve altyazı izleri.
-- F11 tam ekran, Esc tam ekrandan çıkış; uygun odakta Space oynat/duraklat.
-- Kanal değişiminde eski işlem iptal edilir, player durdurulur, eski Media serbest bırakılır. Yerel VLC çağrıları tek sıra üzerinden worker thread'inde yürür.
-- Idle, Loading, Playing, Paused, Buffering, Reconnecting ve Error durumları. Yeniden bağlanma en fazla 3 denemedir (1, 2, 4 saniye bekleme); yeni kanal veya manuel yeniden bağlanma bütçeyi yeniler. İlerlemeyen stream için yaklaşık 25–30 saniyelik kontrol vardır.
-- Favoriler, son oynatılan 20 kanal, ayarlar, kaynaklar ve kanal metadata'sı SQLite'ta kalır. Ağ hatası kayıtlı listeyi silmez. Açılışta ağ gerekmeden yerel liste yüklenir.
-- XMLTV/XMLTV gzip; `tvg-id` eşleştirmesi, saat dilimi ofsetleri ve yerel saat gösterimi; şimdi/sıradaki program, saat, açıklama ve kanal/gün bazlı TV Guide.
-- EPG sadece ilgili kanal kimlikleri için, yaklaşık son 1 gün/gelecek 8 gün aralığında transaction içinde cache'lenir. Tüm XML belge ağacını belleğe yüklemez. Şimdi/sıradaki bilgiler dakika başında yenilenir.
-- Koyu ve açık tema, varsayılan ses düzeyi, otomatik yeniden bağlanma, XMLTV ve kaynak/hesap yönetimi.
+- Multiple local/remote M3U and Xtream sources; add, edit, rename, delete, manually refresh and view the last update time.
+- `tvg-id`, `tvg-name`, `tvg-logo`, `group-title`; missing categories become `Uncategorized`; parsing tolerates malformed metadata and removes exact duplicates.
+- UTF-8/BOM and UTF-16 BOM; Windows-1254 fallback when UTF-8 decoding fails.
+- Case-insensitive name/category search with a 180 ms debounce; virtualized and recycled channel rows.
+- Logos load only for visible rows; 4 concurrent downloads, at most 200 memory and 500 disk entries, a 7-day cache lifetime and a 4 MB file limit. Invalid logos use a TV icon.
+- Play/pause, stop, volume, mute, fullscreen, aspect ratio and available audio/subtitle tracks.
+- F11 fullscreen, Esc exit fullscreen; Space play/pause when focus permits.
+- Changing channels cancels the old operation, stops the player and releases the old Media. Native VLC calls run through a single queue on a worker thread.
+- Idle, Loading, Playing, Paused, Buffering, Reconnecting and Error states. Reconnection is limited to 3 attempts (1, 2 and 4 second delays); selecting a new channel or manually reconnecting resets the budget. A stream that stops progressing is checked after approximately 25–30 seconds.
+- Favorites, the last 20 played channels, settings, sources and channel metadata persist in SQLite. Network errors do not erase the saved playlist. The local playlist loads at startup without a network connection.
+- XMLTV/XMLTV gzip; `tvg-id` matching, time-zone offsets and local-time display; current/next program, times, descriptions and a TV Guide by channel/day.
+- EPG is cached in a transaction only for relevant channel IDs, approximately covering the past day and next 8 days. The full XML document tree is not loaded into memory. Current/next information refreshes at the start of each minute.
+- Dark and light themes, default volume, automatic reconnection, XMLTV and source/account management.
 
-## Veriler ve gizlilik
+## Data and privacy
 
-Varsayılan veri klasörü `%LOCALAPPDATA%\enestv`:
+Default data directory: `%LOCALAPPDATA%\enestv`:
 
-- `library.db`: kaynaklar, kanallar, favoriler, geçmiş, ayarlar ve EPG.
-- `logos/`: indirilen kanal logoları.
-- `logs/enestv.log`: 1 MB'da dönen log ve en fazla üç eski dosya.
+- `library.db`: sources, channels, favorites, history, settings and EPG.
+- `logos/`: downloaded channel logos.
+- `logs/enestv.log`: log rotating at 1 MB with up to three older files.
 
-Kaynak adresi, Xtream kullanıcı adı/parolası, kanal URL'leri/metadata'sı ve ayarlar Windows DPAPI CurrentUser ile şifrelenir. SQLite'ta açık parola tutulmaz. Kaynak adları, favori kimlikleri ve EPG program metinleri şifrelenmez. Loglara URL, kimlik bilgisi veya exception mesajı yazılmaz; sabit olay kodları ve exception türleri kaydedilir. Windows hesapları arasında şifreli veritabanı taşınamaz. Kullanıcının sağladığı orijinal playlist dosyası değiştirilmez.
+Source addresses, Xtream usernames/passwords, channel URLs/metadata and settings are encrypted with Windows DPAPI CurrentUser. Passwords are not stored in plaintext in SQLite. Source names, favorite identifiers and EPG program text are not encrypted. Logs do not contain URLs, credentials or exception messages; they record fixed event codes and exception types. An encrypted database cannot be transferred between Windows accounts. The original playlist file supplied by the user is not modified.
 
-HTTP işlemleri tek uzun ömürlü HttpClient kullanır; redirect, bağlantı zaman aşımı, iptal ve geçici HTTP hatalarında sınırlı geri çekilme desteklenir. İndirme 2 dakika ve boyut sınırlarıyla korunur. Geçici indirme dosyaları işlem sonunda silinir. Şifresiz HTTP seçilirse aktarım HTTPS korumasına sahip olmaz.
+HTTP operations use one long-lived HttpClient, supporting redirects, connection timeouts, cancellation and limited backoff for transient HTTP errors. Downloads have a 2-minute timeout and size limits. Temporary download files are deleted when the operation ends. Unencrypted HTTP does not provide HTTPS transport protection.
 
-Testler için `ENESTV_DATA_DIR` ortam değişkeni veri konumunu değiştirebilir; normal kullanımda gerekmez.
+For tests, the `ENESTV_DATA_DIR` environment variable can override the data location; it is unnecessary for normal use.
 
-## Test ve kabul doğrulaması
+## Tests and acceptance verification
 
 ```powershell
 dotnet test EnesTV.Tests -c Release
@@ -196,34 +198,33 @@ dotnet run --project EnesTV.Smoke -c Release -- --verify ./test-results/integrat
 dotnet run --project EnesTV.Smoke -c Release -- --ui ./test-results/ui
 ```
 
-Her test çalıştırmasında yeni/boş bir sonuç klasörü kullanın. Smoke testleri yalnızca loopback üzerinde yerel sunucu açar, kendi animasyonlu AVI'sini/sessiz WAV'ını üretir ve dış IPTV kaynağı kullanmaz. UI testi gerçek WPF pencerelerini açar; arama, favori, program bilgisi, tam ekran ve pencere boyutunu test eder. UI görselleri WPF render çıktısıdır; native VLC yüzeyi bu görüntülerde siyah görünür. Gerçek video decoder ayrıca LibVLC snapshot ile doğrulanır.
+Use a new, empty results directory for each test run. Smoke tests start a local server on loopback only, generate their own animated AVI/silent WAV and use no external IPTV source. UI tests open real WPF windows and check search, favorites, program information, fullscreen and window size. UI images are WPF render output; the native VLC surface appears black in these images. The actual video decoder is separately verified using a LibVLC snapshot.
 
-Manuel 10.000 kanal testi için:
+For a manual 10,000-channel test:
 
 ```powershell
 dotnet run --project EnesTV.Smoke -c Release -- --serve ./test-fixtures
 ```
 
-Komut 127.0.0.1:18765 üzerinde sunucu başlatır ve `test-fixtures/test-10000.m3u` üretir. Ana uygulamaya `http://127.0.0.1:18765/playlist.m3u` eklenebilir. Bu adres yalnızca geliştirici testidir; hazır uygulamaya dahil edilmez. Ctrl+C sunucuyu kapatır. Çalışma sonuçları `VERIFICATION.md` içinde özetlenmiştir.
+The command starts a server at 127.0.0.1:18765 and generates `test-fixtures/test-10000.m3u`. Add `http://127.0.0.1:18765/playlist.m3u` to the main application. This address is for developer testing only; it is not included in the shipped application. Ctrl+C stops the server. Results are summarized in `VERIFICATION.md`.
 
-## Başlıca bağımlılıklar
+## Main dependencies
 
 - [LibVLCSharp.WPF 3.10.1](https://www.nuget.org/packages/LibVLCSharp.WPF/3.10.1)
 - [VideoLAN.LibVLC.Windows 3.0.23.1](https://www.nuget.org/packages/VideoLAN.LibVLC.Windows/3.0.23.1)
 - [Microsoft.Data.Sqlite 8.0.30](https://www.nuget.org/packages/Microsoft.Data.Sqlite/8.0.30)
-- System.Security.Cryptography.ProtectedData 8.0.0 ve System.Text.Encoding.CodePages 8.0.0
-- Testlerde xUnit ve Microsoft.NET.Test.Sdk
+- System.Security.Cryptography.ProtectedData 8.0.0 and System.Text.Encoding.CodePages 8.0.0
+- Tests use xUnit and Microsoft.NET.Test.Sdk
 
-MVVM için ek framework bağımlılığı kullanılmadı.
+No additional MVVM framework dependency is used.
 
-## Bilinen sınırlar
+## Known limitations
 
-- DRM, portal/MAC girişi, catch-up, kayıt ve timeshift bu sürümde yoktur. Film/dizi katalogları Xtream hesaplarıyla desteklenir; genel M3U listelerinden otomatik dizi kataloğu çıkarılmaz.
-- Xtream canlı kanallar, film/dizi katalogları ve XMLTV EPG uygulanmıştır; sağlayıcıya özgü standart dışı API varyasyonları veya özel HTTP header/cookie isteyen stream'ler desteklenmez.
-- Doğrudan HLS manifestleri kanal URL'si olarak LibVLC'ye verilir; dosya içe aktarma IPTV kanal listeleri içindir. HLS segment manifesti kanal kataloğu değildir.
-- XMLTV ofseti belirtilmezse UTC kabul edilir; geçersiz veya eksik bitiş saatli programlar atlanır. Rehber indirme manuel tetiklenir.
-- Son 20 kanalın kaydı oynatma başladığında yapılır; sadece başarısız bağlantı denemeleri geçmişe eklenmez.
-- Decoder/ses/altyazı özellikleri kaynağın sağladığı izlerle sınırlıdır. Canlı kaynağın duraklatmaya izin verme biçimi sağlayıcıya bağlıdır.
-- DPAPI ile şifreli kaynaklar başka bir Windows hesabında açılamaz. Kurulum EXE'si kod imzası içermez; ayrıca klasör dağıtımı üretilebilir.
-- Gerçek bir kullanıcının sağlayıcı hesabıyla uzun süreli test yapılmadı. Ağ/sağlayıcı, ekran kartı ve codec çeşitliliği için gerçek kullanım doğrulaması gerekir.
-
+- DRM, portal/MAC login, catch-up, recording and timeshift are unavailable in this version. Movie/series catalogs are supported through Xtream accounts; generic M3U lists are not automatically converted into series catalogs.
+- Xtream live channels, movie/series catalogs and XMLTV EPG are implemented; provider-specific nonstandard API variants and streams requiring custom HTTP headers/cookies are unsupported.
+- Direct HLS manifests are passed to LibVLC as channel URLs; file import is for IPTV channel lists. An HLS segment manifest is not a channel catalog.
+- XMLTV without a specified offset is treated as UTC; programs with invalid or missing end times are skipped. Guide downloads are triggered manually.
+- The last 20 channels are recorded when playback starts; failed connection attempts alone are not added to history.
+- Decoder/audio/subtitle capabilities are limited to the tracks supplied by the source. How a live source supports pausing depends on the provider.
+- DPAPI-encrypted sources cannot be opened under another Windows account. The installer EXE is not code-signed; a folder distribution can also be produced.
+- Long-duration testing with a real user's provider account has not been performed. Network/provider, GPU and codec variety require real-world verification.

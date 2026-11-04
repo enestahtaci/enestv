@@ -1,83 +1,83 @@
-# Üçüncü taraf bileşenleri
+# Third-party components
 
 enestv: GPL-3.0-or-later. Copyright (c) 2026 enestv katkıcıları.
-Bu lisans üçüncü taraf bileşenlerin lisanslarını değiştirmez.
-Bu envanter mevcut 1.3.0 payload'ını açıklar. Eklentiler bu sürümde korunur; çıkarma önerisi v1.4'e ertelenmiştir.
-Üçüncü taraf bileşenlerin kendi lisans ve telif bildirimleri korunur; aşağıdaki kaynak teklifi bu dağıtımla birlikte sunulur.
+This license does not change the licenses of third-party components.
+This inventory describes the current 1.3.0 payload. Plugins are retained in this version; the removal proposal has been deferred to v1.4.
+Third-party components' own license and copyright notices are preserved; the source offer below accompanies this distribution.
 
-## Çalışma zamanı
+## Runtime
 
-| Bileşen | Sürüm | Gerçek lisans kapsamı | Telif / kaynak |
+| Component | Version | Actual license scope | Copyright / source |
 | --- | --- | --- | --- |
-| LibVLCSharp ve LibVLCSharp.WPF | 3.10.1 | LGPL-2.1-or-later | VideoLAN ve ilgili kaynak dosyalarında belirtilen katkıcılar. https://code.videolan.org/videolan/LibVLCSharp |
-| VideoLAN.LibVLC.Windows | 3.0.23.1 | NuGet etiketi LGPL-2.1-or-later; payload karma | VideoLAN ve ilgili kaynak dosyalarının katkıcıları. https://code.videolan.org/videolan/libvlc-nuget |
-| libvlc.dll / libvlccore.dll | VLC 3.0.23 dağıtımı | LGPL-2.1-or-later | Telif ve lisans bildirimleri VLC kaynak dosyalarında korunur; kaynak teklifi kapsamındadır |
-| libdolby_surround_decoder_plugin.dll, libheadphone_channel_mixer_plugin.dll, libx26410b_plugin.dll, liblua_plugin.dll | VLC 3.0.23 dağıtımı | GPL-2.0-or-later | GPL ve telif bildirimleri ilgili kaynak dosyalarında korunur; kaynak teklifi kapsamındadır |
-| libavcodec_plugin.dll içindeki FFmpeg | Gömülü sürüm 4.4.5 | GPL-2.0-or-later etkin derleme | GPL etkin FFmpeg; 4.4.5 arşiv hash'i ve imzası doğrulandı. 14 contrib yaması ve build tarifleri VLC arşivinde; ilgili değişiklikler ve statik kütüphaneler kaynak teklifine dahildir. https://ffmpeg.org/legal.html |
-| Diğer VLC plugin DLL'leri | VLC 3.0.23 dağıtımı | İlgili kaynak dosyalarında belirtilen lisanslar; GPL/LGPL modülleri kaynak teklifine dahildir | VideoLAN ve ilgili modül katkıcıları; kaynak dosyalarındaki telif bildirimleri korunur |
-| libbluray JAR dosyaları | Dosya adlarında 1.4.0 | İlgili libbluray kaynak dosyalarının lisansları | İlgili libbluray katkıcıları; native bileşen ve JAR kaynakları teklif kapsamındadır |
-| dodeca_and_7channel_3DSL_HRTF.sofa | Paket 3.0.23.1 | LGPL-2.1-or-later | Copyright (C) 2017 3D Sound Labs |
-| VLC HTTP HTML ve yardımcı kaynakları | VLC 3.0.23 | HTML GPL-2.0-or-later; diğer dosyalar kendi lisanslarıyla | Örnek: Copyright (C) 2005-2014 VLC authors and VideoLAN; dosyalardaki farklı başlıklar ayrıca korunur |
-| jsTree | 1.0-rc3 | MIT OR GPL-2.0; MIT seçeneğiyle dağıtılır | Copyright (c) 2010 Ivan Bozhanov (vakata.com) |
-| jQuery UI CSS ve tema kaynakları | 1.8.13 | MIT OR GPL-2.0; MIT seçeneğiyle dağıtılır | Copyright 2011, AUTHORS.txt (http://jqueryui.com/about) |
-| Microsoft.Data.Sqlite ve Microsoft.Data.Sqlite.Core | 8.0.30 | MIT | Copyright Microsoft Corporation. All rights reserved. https://github.com/dotnet/efcore |
+| LibVLCSharp and LibVLCSharp.WPF | 3.10.1 | LGPL-2.1-or-later | VideoLAN and contributors identified in the relevant source files. https://code.videolan.org/videolan/LibVLCSharp |
+| VideoLAN.LibVLC.Windows | 3.0.23.1 | NuGet label: LGPL-2.1-or-later; mixed payload | VideoLAN and contributors to the relevant source files. https://code.videolan.org/videolan/libvlc-nuget |
+| libvlc.dll / libvlccore.dll | VLC 3.0.23 distribution | LGPL-2.1-or-later | Copyright and license notices are preserved in the VLC source files; covered by the source offer |
+| libdolby_surround_decoder_plugin.dll, libheadphone_channel_mixer_plugin.dll, libx26410b_plugin.dll, liblua_plugin.dll | VLC 3.0.23 distribution | GPL-2.0-or-later | GPL and copyright notices are preserved in the relevant source files; covered by the source offer |
+| FFmpeg within libavcodec_plugin.dll | Embedded version 4.4.5 | GPL-2.0-or-later enabled build | GPL-enabled FFmpeg; the 4.4.5 archive hash and signature were verified. The 14 contrib patches and build recipes are in the VLC archive; relevant modifications and static libraries are included in the source offer. https://ffmpeg.org/legal.html |
+| Other VLC plugin DLLs | VLC 3.0.23 distribution | Licenses specified in the relevant source files; GPL/LGPL modules are included in the source offer | VideoLAN and relevant module contributors; copyright notices in source files are preserved |
+| libbluray JAR files | 1.4.0 in filenames | Licenses of the relevant libbluray source files | Relevant libbluray contributors; native component and JAR sources are covered by the offer |
+| dodeca_and_7channel_3DSL_HRTF.sofa | Package 3.0.23.1 | LGPL-2.1-or-later | Copyright (C) 2017 3D Sound Labs |
+| VLC HTTP HTML and supporting resources | VLC 3.0.23 | HTML: GPL-2.0-or-later; other files under their own licenses | Example: Copyright (C) 2005-2014 VLC authors and VideoLAN; differing headers in individual files are also preserved |
+| jsTree | 1.0-rc3 | MIT OR GPL-2.0; distributed under the MIT option | Copyright (c) 2010 Ivan Bozhanov (vakata.com) |
+| jQuery UI CSS and theme resources | 1.8.13 | MIT OR GPL-2.0; distributed under the MIT option | Copyright 2011, AUTHORS.txt (http://jqueryui.com/about) |
+| Microsoft.Data.Sqlite and Microsoft.Data.Sqlite.Core | 8.0.30 | MIT | Copyright Microsoft Corporation. All rights reserved. https://github.com/dotnet/efcore |
 | SQLitePCLRaw.bundle_e_sqlite3, core, lib.e_sqlite3, provider.e_sqlite3 | 2.1.12 | Apache-2.0 | Copyright 2014-2024 SourceGear, LLC. https://github.com/ericsink/SQLitePCL.raw |
-| e_sqlite3.dll / SQLite | Binary'de 3.53.3 sürüm dizgesi | Public domain | https://www.sqlite.org/copyright.html  |
+| e_sqlite3.dll / SQLite | Version string 3.53.3 in the binary | Public domain | https://www.sqlite.org/copyright.html  |
 | System.Security.Cryptography.ProtectedData; System.Text.Encoding.CodePages | 8.0.0 | MIT | Copyright Microsoft Corporation. All rights reserved |
-| System.Memory | 4.5.3 | MIT ve paket third-party bildirimleri | Copyright (c) .NET Foundation and Contributors. All rights reserved |
-| Microsoft.NETCore.App; Microsoft.WindowsDesktop.App | Payload'da 8.0.31 | MIT ve ilgili üçüncü taraf koşulları | licenses/dotnet-LICENSE.txt ve dotnet-THIRD-PARTY-NOTICES.txt |
-| vcruntime140_cor3.dll | Dağıtılan .NET 8.0.31 runtime bileşeni | İlgili Microsoft runtime dağıtım koşulları | Microsoft; .NET paketinin ilgili lisans/telif bildirimleri korunur |
-| Segoe UI | Windows sistem fontu | Windows font koşulları | Microsoft; font dosyası dağıtılmaz, yalnız adıyla kullanılır |
+| System.Memory | 4.5.3 | MIT and package third-party notices | Copyright (c) .NET Foundation and Contributors. All rights reserved |
+| Microsoft.NETCore.App; Microsoft.WindowsDesktop.App | 8.0.31 in the payload | MIT and applicable third-party terms | licenses/dotnet-LICENSE.txt and dotnet-THIRD-PARTY-NOTICES.txt |
+| vcruntime140_cor3.dll | Distributed .NET 8.0.31 runtime component | Applicable Microsoft runtime distribution terms | Microsoft; relevant license/copyright notices from the .NET package are preserved |
+| Segoe UI | Windows system font | Windows font terms | Microsoft; the font file is not distributed and is only referenced by name |
 
-Dağıtıma dahil native kütüphanelerin ilgili kaynakları, değişiklikleri ve statik bağımlılıkları aşağıdaki kaynak teklifinin kapsamındadır.
-DLL'ler ayrı dosyalar olarak dağıtılır. LGPL kütüphaneleri arayüz uyumlu değiştirilmiş sürümlerle kullanabilme, ilgili kaynakları edinme ve bu değişiklikleri hata ayıklama hakları korunmalıdır. 
+The relevant sources, modifications and static dependencies of native libraries included in the distribution are covered by the source offer below.
+DLLs are distributed as separate files. The rights to use LGPL libraries with interface-compatible modified versions, obtain the relevant sources and debug these modifications must be preserved.
 
-Ek runtime kaynak kapsamı: libgme_plugin.dll için Game Music Emu, libschroedinger_plugin.dll için Orc, libupnp_plugin.dll için libupnp ve statik pthread çalışma zamanı kaynakları kaynak teklifine dahildir. Arşiv adresleri ve checksum'lar SOURCE-ACCESS.md içindedir. Windows MIDI modülünün FluidLite kaynakları da korunur.
+Additional runtime source scope: Game Music Emu for libgme_plugin.dll, Orc for libschroedinger_plugin.dll, libupnp for libupnp_plugin.dll and static pthread runtime sources are included in the source offer. Archive URLs and checksums are in SOURCE-ACCESS.md. FluidLite sources for the Windows MIDI module are also preserved.
 
-## Yalnızca geliştirme
+## Development only
 
-Test paketleri runtime envanteriyle karıştırılmaz; uygulama payload'ında oldukları varsayılmaz.
+Test packages are kept separate from the runtime inventory; they are not assumed to be in the application payload.
 
-| Paket | Sürüm | Lisans / telif |
+| Package | Version | License / copyright |
 | --- | --- | --- |
 | Microsoft.NET.Test.Sdk, Microsoft.CodeCoverage, Microsoft.TestPlatform.ObjectModel, Microsoft.TestPlatform.TestHost | 17.11.1 | MIT; Microsoft Corporation |
 | Newtonsoft.Json | 13.0.1 | MIT; Copyright James Newton-King 2008 |
-| System.Reflection.Metadata | 1.6.0 | MIT; Microsoft Corporation ve paket third-party bildirimleri |
+| System.Reflection.Metadata | 1.6.0 | MIT; Microsoft Corporation and package third-party notices |
 | xunit, xunit.assert, xunit.core, xunit.extensibility.core, xunit.extensibility.execution | 2.9.2 | Apache-2.0; Copyright (C) .NET Foundation |
 | xunit.runner.visualstudio | 2.8.2 | Apache-2.0; Copyright (C) .NET Foundation |
 | xunit.analyzers | 1.16.0 | Apache-2.0; Copyright (C) .NET Foundation |
 | xunit.abstractions | 2.0.3 | Apache-2.0; Copyright (c) .NET Foundation and Contributors |
 
-## Kurulum aracı
+## Installer tool
 
-Inno Setup 6 serisi kurulum aracı.
+Inno Setup 6 series installer tool.
 Copyright (C) 1997-2026 Jordan Russell. All rights reserved.
 Portions Copyright (C) 2000-2026 Martijn Laan. All rights reserved.
-Özel Inno Setup lisansı: licenses/Inno-Setup-LICENSE.txt ve https://jrsoftware.org/files/is/license.txt .
+Custom Inno Setup license: licenses/Inno-Setup-LICENSE.txt and https://jrsoftware.org/files/is/license.txt .
 
-## Kaynak kodu
+## Source code
 
-enestv kaynak deposu: https://github.com/enestahtaci/enestv
-Sürümler ve kaynak ekleri: https://github.com/enestahtaci/enestv/releases
-Her Release'e VLC 3.0.23 ve FFmpeg 4.4.5 resmi kaynak arşivleri ve SHA-256 değerleri eklenir. FFmpeg için VLC contrib yamaları ve build tarifleri VLC arşivindedir. İndirilebilir dosyalar, hash'ler ve kaynak teklifi [SOURCE-ACCESS.md](SOURCE-ACCESS.md) içindedir.
+enestv source repository: https://github.com/enestahtaci/enestv
+Releases and source attachments: https://github.com/enestahtaci/enestv/releases
+Each Release includes the official VLC 3.0.23 and FFmpeg 4.4.5 source archives and their SHA-256 values. VLC contrib patches and build recipes for FFmpeg are in the VLC archive. Downloads, hashes and the source offer are in [SOURCE-ACCESS.md](SOURCE-ACCESS.md).
 
-## Yazılı kaynak kodu teklifi
+## Written source code offer
 
-GPLv2 §3(b) ve LGPLv2.1 §6(c) kapsamında, bu teklifin eşlik ettiği enestv dağıtımlarında yer alan aşağıdaki bileşenlerin tam karşılık gelen, makine tarafından okunabilir kaynak kodunu talep eden herkese sağlamayı teklif ediyoruz:
+Under GPLv2 §3(b) and LGPLv2.1 §6(c), we offer to provide anyone who requests it with the complete corresponding machine-readable source code for the following components included in enestv distributions accompanied by this offer:
 
-- VLC/LibVLC 3.0.23 ve beraberindeki GPL/LGPL modülleri; mevcut paketteki x264 encoder, Lua, Dolby surround ve headphone mixer dahil.
-- FFmpeg 4.4.5 ve dağıtıma statik bağlanan ilgili üçüncü taraf kütüphaneleri; libgsm, OpenJPEG ve LAME dahil.
-- Dağıtılan VLC modüllerindeki Game Music Emu ve Orc çalışma zamanı kodu ile ilgili winpthreads çalışma zamanı kaynakları.
-- libbluray native bileşeni ve dağıtılan libbluray 1.4.0 JAR dosyaları.
-- Bu bileşenlerde kullanılan vendor değişiklikleri, yamalar ve derleme/kurulum betikleri; LGPLv2.1 §6(a) kapsamında gerektiğinde değiştirilmiş kütüphaneyle yeniden bağlantı kurmak için gerekli uygulama kaynak veya nesne dosyaları.
+- VLC/LibVLC 3.0.23 and its accompanying GPL/LGPL modules, including the x264 encoder, Lua, Dolby surround and headphone mixer in the current package.
+- FFmpeg 4.4.5 and the relevant third-party libraries statically linked into the distribution, including libgsm, OpenJPEG and LAME.
+- Game Music Emu and Orc runtime code in the distributed VLC modules, and the relevant winpthreads runtime sources.
+- The libbluray native component and the distributed libbluray 1.4.0 JAR files.
+- Vendor modifications, patches and build/installation scripts used in these components; application source or object files necessary, where required under LGPLv2.1 §6(a), to relink with a modified library.
 
-Teklif, eşlik ettiği her binary dağıtım tarihinden itibaren en az üç yıl geçerlidir. Talep için https://github.com/enestahtaci/enestv/issues adresinden veya enestahtaci03@gmail.com üzerinden sürüm ve bileşen adını belirtin; hesap parolası veya yayın adresi göndermeyin.
-Kaynaklar elektronik olarak ücretsiz, istenirse yazılım değişiminde yaygın kullanılan fiziksel bir ortamda yalnızca kaynak dağıtımını fiilen gerçekleştirme maliyetini aşmayan bedelle sağlanır. İlgili GPL/LGPL lisansları, telif bildirimleri ve yeniden dağıtım hakları korunur. Teklifin yerine getirilmesinden enestv dağıtıcısı sorumludur; upstream'e başvurma zorunluluğu yoktur.
+The offer is valid for at least three years from the date of each binary distribution it accompanies. To request sources, specify the version and component name at https://github.com/enestahtaci/enestv/issues or via enestahtaci03@gmail.com; do not send account passwords or stream addresses.
+Sources are provided electronically free of charge or, on request, on a physical medium customarily used for software interchange, for a charge no greater than the cost of physically performing source distribution. The applicable GPL/LGPL licenses, copyright notices and redistribution rights are preserved. The enestv distributor is responsible for fulfilling the offer; there is no requirement to contact upstream.
 
-## VideoLAN contrib kaynak referansları
+## VideoLAN contrib source references
 
-- Resmi kaynak aynası: https://download.videolan.org/pub/contrib/ . FFmpeg 4.4.5 ayrıca https://download.videolan.org/pub/contrib/ffmpeg/ dizininde listelenir.
-- Sürüme ait tarif ve yamalar, resmi VLC 3.0.23 arşivindeki `contrib/src/` altında bulunur; FFmpeg için `contrib/src/ffmpeg/rules.mak`, `SHA512SUMS` ve yama dosyaları kullanılır.
-- https://download.videolan.org/pub/videolan/contrib/ dizini platforma göre hazır contrib paketleri de içerir; kaynak arşivi yerine kullanıldığı varsayılmaz.
+- Official source mirror: https://download.videolan.org/pub/contrib/ . FFmpeg 4.4.5 is also listed at https://download.videolan.org/pub/contrib/ffmpeg/ .
+- Version-specific recipes and patches are under `contrib/src/` in the official VLC 3.0.23 archive; for FFmpeg, `contrib/src/ffmpeg/rules.mak`, `SHA512SUMS` and the patch files are used.
+- https://download.videolan.org/pub/videolan/contrib/ also contains prebuilt contrib packages by platform; these are not assumed to substitute for source archives.
 
-Bu adresler referanstır. Kaynak teklifinin muhatabı enestv dağıtıcısıdır; alıcı yalnız upstream bağlantılarına yönlendirilmez.
+These addresses are references. The source offer is made by the enestv distributor; recipients are not merely directed to upstream links.

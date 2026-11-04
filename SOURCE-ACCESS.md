@@ -1,57 +1,57 @@
-# Kaynak kodu ve yazılı kaynak teklifi
+# Source code and written source offer
 
-Kaynak deposu: https://github.com/enestahtaci/enestv
-Release ekleri: https://github.com/enestahtaci/enestv/releases
-Her Release'e aşağıdaki doğrulanmış resmi kaynak arşivleri ve bu dosyaların hash'leri eklenir. enestv'nin aynı sürüm kaynak arşivi de birlikte sunulur.
+Source repository: https://github.com/enestahtaci/enestv
+Release attachments: https://github.com/enestahtaci/enestv/releases
+Each Release includes the following verified official source archives and their hashes. The enestv source archive for the same version is also provided.
 
-| Arşiv | Resmi indirme adresi | SHA-256 |
+| Archive | Official download URL | SHA-256 |
 | --- | --- | --- |
 | VLC 3.0.23 | https://download.videolan.org/pub/videolan/vlc/3.0.23/vlc-3.0.23.tar.xz | e891cae6aa3ccda69bf94173d5105cbc55c7a7d9b1d21b9b21666e69eff3e7e0 |
 | FFmpeg 4.4.5 | https://ffmpeg.org/releases/ffmpeg-4.4.5.tar.xz | f9514e0d3515aee5a271283df71636e1d1ff7274b15853bcd84e144be416ab07 |
 
-VLC hash'i resmi `.sha256` dosyasıyla karşılaştırıldı. FFmpeg arşivinin SHA-512 değeri VLC `contrib/src/ffmpeg/SHA512SUMS` değeriyle eşleşti ve ayrık imzası doğrulandı.
-FFmpeg imza dosyası: https://ffmpeg.org/releases/ffmpeg-4.4.5.tar.xz.asc . Yayın anahtarı fingerprint'i: `FCF986EA15E6E293A5644F10B4322F04D67658D8`.
-VLC checksum dosyası: https://download.videolan.org/pub/videolan/vlc/3.0.23/vlc-3.0.23.tar.xz.sha256 .
+The VLC hash was compared with the official `.sha256` file. The FFmpeg archive's SHA-512 matched VLC's `contrib/src/ffmpeg/SHA512SUMS`, and its detached signature was verified.
+FFmpeg signature file: https://ffmpeg.org/releases/ffmpeg-4.4.5.tar.xz.asc . Release key fingerprint: `FCF986EA15E6E293A5644F10B4322F04D67658D8`.
+VLC checksum file: https://download.videolan.org/pub/videolan/vlc/3.0.23/vlc-3.0.23.tar.xz.sha256 .
 
-FFmpeg 4.4.5 için 14 yama ve build tarifi VLC 3.0.23 arşivinin `contrib/src/ffmpeg/` dizinindedir. Windows x64 tarifinde GPL seçimiyle `--enable-gpl --enable-postproc`; statik bağlantı için `--enable-static --disable-shared` kullanılır. Gerekli diğer kaynak ve değişiklikler aşağıdaki teklif kapsamındadır.
+The 14 patches and build recipe for FFmpeg 4.4.5 are in the `contrib/src/ffmpeg/` directory of the VLC 3.0.23 archive. The Windows x64 recipe uses `--enable-gpl --enable-postproc` when GPL is selected, and `--enable-static --disable-shared` for static linking. Other required sources and modifications are covered by the offer below.
 
-## Yazılı kaynak kodu teklifi
+## Written source code offer
 
-GPLv2 §3(b) ve LGPLv2.1 §6(c) kapsamında, bu teklifin eşlik ettiği enestv dağıtımlarında yer alan aşağıdaki bileşenlerin tam karşılık gelen, makine tarafından okunabilir kaynak kodunu talep eden herkese sağlamayı teklif ediyoruz:
+Under GPLv2 §3(b) and LGPLv2.1 §6(c), we offer to provide anyone who requests it with the complete corresponding machine-readable source code for the following components included in enestv distributions accompanied by this offer:
 
-- VLC/LibVLC 3.0.23 ve beraberindeki GPL/LGPL modülleri; mevcut paketteki x264 encoder, Lua, Dolby surround ve headphone mixer dahil.
-- FFmpeg 4.4.5 ve dağıtıma statik bağlanan ilgili üçüncü taraf kütüphaneleri; libgsm, OpenJPEG ve LAME dahil.
-- Dağıtılan VLC modüllerindeki Game Music Emu ve Orc çalışma zamanı kodu ile ilgili winpthreads çalışma zamanı kaynakları.
-- libbluray native bileşeni ve dağıtılan libbluray 1.4.0 JAR dosyaları.
-- Bu bileşenlerde kullanılan vendor değişiklikleri, yamalar ve derleme/kurulum betikleri; LGPLv2.1 §6(a) kapsamında gerektiğinde değiştirilmiş kütüphaneyle yeniden bağlantı kurmak için gerekli uygulama kaynak veya nesne dosyaları.
+- VLC/LibVLC 3.0.23 and its accompanying GPL/LGPL modules, including the x264 encoder, Lua, Dolby surround and headphone mixer in the current package.
+- FFmpeg 4.4.5 and the relevant third-party libraries statically linked into the distribution, including libgsm, OpenJPEG and LAME.
+- Game Music Emu and Orc runtime code in the distributed VLC modules, and the relevant winpthreads runtime sources.
+- The libbluray native component and the distributed libbluray 1.4.0 JAR files.
+- Vendor modifications, patches and build/installation scripts used in these components; application source or object files necessary, where required under LGPLv2.1 §6(a), to relink with a modified library.
 
-Teklif, eşlik ettiği her binary dağıtım tarihinden itibaren en az üç yıl geçerlidir. Talep için https://github.com/enestahtaci/enestv/issues adresinden veya enestahtaci03@gmail.com üzerinden sürüm ve bileşen adını belirtin; hesap parolası veya yayın adresi göndermeyin.
-Kaynaklar elektronik olarak ücretsiz, istenirse yazılım değişiminde yaygın kullanılan fiziksel bir ortamda yalnızca kaynak dağıtımını fiilen gerçekleştirme maliyetini aşmayan bedelle sağlanır. İlgili GPL/LGPL lisansları, telif bildirimleri ve yeniden dağıtım hakları korunur. Teklifin yerine getirilmesinden enestv dağıtıcısı sorumludur; upstream'e başvurma zorunluluğu yoktur.
+The offer is valid for at least three years from the date of each binary distribution it accompanies. To request sources, specify the version and component name at https://github.com/enestahtaci/enestv/issues or via enestahtaci03@gmail.com; do not send account passwords or stream addresses.
+Sources are provided electronically free of charge or, on request, on a physical medium customarily used for software interchange, for a charge no greater than the cost of physically performing source distribution. The applicable GPL/LGPL licenses, copyright notices and redistribution rights are preserved. The enestv distributor is responsible for fulfilling the offer; there is no requirement to contact upstream.
 
-## VideoLAN contrib kaynak referansları
+## VideoLAN contrib source references
 
-- Resmi kaynak aynası: https://download.videolan.org/pub/contrib/ . FFmpeg 4.4.5 ayrıca https://download.videolan.org/pub/contrib/ffmpeg/ dizininde listelenir.
-- Sürüme ait tarif ve yamalar, resmi VLC 3.0.23 arşivindeki `contrib/src/` altında bulunur; FFmpeg için `contrib/src/ffmpeg/rules.mak`, `SHA512SUMS` ve yama dosyaları kullanılır.
-- https://download.videolan.org/pub/videolan/contrib/ dizini platforma göre hazır contrib paketleri de içerir; kaynak arşivi yerine kullanıldığı varsayılmaz.
+- Official source mirror: https://download.videolan.org/pub/contrib/ . FFmpeg 4.4.5 is also listed at https://download.videolan.org/pub/contrib/ffmpeg/ .
+- Version-specific recipes and patches are under `contrib/src/` in the official VLC 3.0.23 archive; for FFmpeg, `contrib/src/ffmpeg/rules.mak`, `SHA512SUMS` and the patch files are used.
+- https://download.videolan.org/pub/videolan/contrib/ also contains prebuilt contrib packages by platform; these are not assumed to substitute for source archives.
 
-Bu adresler referanstır. Kaynak teklifinin muhatabı enestv dağıtıcısıdır; alıcı yalnız upstream bağlantılarına yönlendirilmez.
+These addresses are references. The source offer is made by the enestv distributor; recipients are not merely directed to upstream links.
 
-## Release ekleri ve lisanslar
+## Release attachments and licenses
 
-VLC ve FFmpeg arşivleri; FFmpeg ayrık imzası; resmi checksum dosyaları; enestv kaynak arşivi; bu belgedeki kaynak teklifi ve THIRD-PARTY-NOTICES.md; bütün eklerden hesaplanan SHA256SUMS.txt yayımlanır.
-Kaynaklar ilgili üçüncü taraf lisansları altında sunulur; enestv'nin GPL-3.0-or-later lisansı üçüncü taraf lisanslarını değiştirmez. LGPL kütüphaneleri arayüz uyumlu değiştirilmiş sürümlerle kullanma ve gerekli hata ayıklama hakları korunur.
+The VLC and FFmpeg archives; the FFmpeg detached signature; official checksum files; the enestv source archive; the source offer in this document and THIRD-PARTY-NOTICES.md; and SHA256SUMS.txt calculated from all attachments are published.
+Sources are provided under their applicable third-party licenses; enestv's GPL-3.0-or-later license does not change third-party licenses. The rights to use LGPL libraries with interface-compatible modified versions and to perform the necessary debugging are preserved.
 
-## Ek runtime kaynak arşivleri
+## Additional runtime source archives
 
-Aşağıdaki kaynaklar mevcut Windows x64 modülleri için eklenir. Farklı sıkıştırma veya sağlayıcı arşivlerinin checksum'ları birbirinin yerine kullanılmaz.
+The following sources are included for the current Windows x64 modules. Checksums for different compression formats or vendor archives are not interchangeable.
 
-| Bileşen | Resmi kaynak | SHA-256 | Kontrol |
+| Component | Official source | SHA-256 | Verification |
 | --- | --- | --- | --- |
-| gme | https://github.com/libgme/game-music-emu/archive/refs/tags/0.6.3.tar.gz | 4c5a7614acaea44e5cb1423817d2889deb82674ddbc4e3e1291614304b86fca0 | VLC contrib SHA-512 eşleşti |
-| orc | https://gstreamer.freedesktop.org/src/orc/orc-0.4.33.tar.xz | 844e6d7db8086f793f57618d3d4b68d29d99b16034e71430df3c21cfd3c3542a | Upstream yayımlanmış SHA-256 eşleşti |
-| upnp | https://github.com/pupnp/pupnp/archive/refs/tags/release-1.14.13.tar.gz | 8c099da99b3506bef683d46415bc3158260ca5528b4cec211d880eb5dea61176 | VLC contrib SHA-512 eşleşti |
-| pthreads | https://github.com/mingw-w64/mingw-w64/archive/refs/tags/v10.0.0.tar.gz | b0f94a32e91b011e53abc2d855139cc3f3cef87a65c04830345b0203c7d453cb | İndirilenden hesaplandı; önceden doğrulanmış hash değil |
+| gme | https://github.com/libgme/game-music-emu/archive/refs/tags/0.6.3.tar.gz | 4c5a7614acaea44e5cb1423817d2889deb82674ddbc4e3e1291614304b86fca0 | Matched VLC contrib SHA-512 |
+| orc | https://gstreamer.freedesktop.org/src/orc/orc-0.4.33.tar.xz | 844e6d7db8086f793f57618d3d4b68d29d99b16034e71430df3c21cfd3c3542a | Matched upstream's published SHA-256 |
+| upnp | https://github.com/pupnp/pupnp/archive/refs/tags/release-1.14.13.tar.gz | 8c099da99b3506bef683d46415bc3158260ca5528b4cec211d880eb5dea61176 | Matched VLC contrib SHA-512 |
+| pthreads | https://github.com/mingw-w64/mingw-w64/archive/refs/tags/v10.0.0.tar.gz | b0f94a32e91b011e53abc2d855139cc3f3cef87a65c04830345b0203c7d453cb | Calculated from the download; not a previously verified hash |
 
-GME kaynağı contrib tarifindeki 0.6.3, Orc 0.4.33 ve UPnP 1.14.13 sürümleridir. Orc ve UPnP sürümleri payload dizgeleriyle eşleşir. mingw-w64 v10.0.0 arşivinin winpthreads bölümü runtime kaynakları için saklanır; bütün arşiv yalnız SDK sayılarak dışlanmaz.
+The GME source is version 0.6.3 from the contrib recipe; Orc is 0.4.33 and UPnP is 1.14.13. Orc and UPnP versions match the payload strings. The winpthreads portion of the mingw-w64 v10.0.0 archive is retained for runtime sources; the entire archive is not excluded as merely an SDK.
 
-Bu Windows x64 payload'ında FluidSynth 2.1.8 yerine FluidLite 1.2.2 kullanılır; FluidLite kaynağı arşive dahildir. Tremor yerine libVorbis 1.3.6 kullanılır. Daala ve x262 bu payload'ın kaynak listesine eklenmez. Bu ayrım x264 veya Lua'yı kapsamdan çıkarmaz.
+This Windows x64 payload uses FluidLite 1.2.2 instead of FluidSynth 2.1.8; the FluidLite source is included in the archive collection. libVorbis 1.3.6 is used instead of Tremor. Daala and x262 are not added to this payload's source list. This distinction does not remove x264 or Lua from scope.
