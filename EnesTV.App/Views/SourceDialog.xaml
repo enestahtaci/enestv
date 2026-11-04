@@ -1,0 +1,13 @@
+<Window Style="{StaticResource {x:Type Window}}" x:Class="EnesTV.App.Views.SourceDialog" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="enestv · Kaynak" Width="570" Height="570" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+ <Grid Margin="30"><Grid.RowDefinitions><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="0,0,6,0">
+  <TextBlock Text="Kaynak ekle" FontSize="26" FontWeight="SemiBold"/><TextBlock Text="Kendi IPTV bağlantınızı veya hesabınızı ekleyin." Foreground="{DynamicResource Muted}" Margin="0,8,0,22"/>
+  <TextBlock Text="Kaynak türü" Margin="0,0,0,7"/><ComboBox x:Name="Kind" SelectionChanged="Kind_Changed"><ComboBoxItem Content="M3U URL" Tag="M3uUrl"/><ComboBoxItem Content="Yerel M3U dosyası" Tag="M3uFile"/><ComboBoxItem Content="Xtream Codes" Tag="Xtream"/></ComboBox>
+  <Border Background="{DynamicResource Panel}" CornerRadius="8" Padding="12" Margin="0,10,0,0"><TextBlock x:Name="KindHint" Text="M3U bağlantınızla canlı TV kanallarını içe aktarın." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" FontSize="12"/></Border><TextBlock Text="Kaynak adı" Margin="0,16,0,7"/><TextBox x:Name="SourceName" AutomationProperties.Name="Kaynak adı"/>
+  <TextBlock x:Name="LocationLabel" Text="M3U URL" Margin="0,16,0,7"/>
+  <DockPanel><Button x:Name="Browse" Content="Seç" DockPanel.Dock="Right" Click="Browse_Click" Visibility="Collapsed"/><TextBox x:Name="Location" AutomationProperties.Name="Kaynak adresi"/></DockPanel>
+  <StackPanel x:Name="Credentials" Visibility="Collapsed"><TextBlock Text="Kullanıcı adı" Margin="0,16,0,7"/><TextBox x:Name="Username" AutomationProperties.Name="Kullanıcı adı"/><TextBlock Text="Parola" Margin="0,16,0,7"/><PasswordBox x:Name="Password" AutomationProperties.Name="Parola"/><TextBlock Text="Bu hesaba ait bilgiler Windows kullanıcı hesabınızla şifrelenir." TextWrapping="Wrap" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,10"/></StackPanel>
+  <TextBlock x:Name="ErrorText" TextWrapping="Wrap" Foreground="{DynamicResource Warning}" Margin="0,14,0,0"/>
+  </StackPanel></ScrollViewer><StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0"><Button Content="Vazgeç" IsCancel="True"/><Button x:Name="Save" Content="Kaynağı ekle" Style="{StaticResource PrimaryButton}" Click="Save_Click" IsDefault="True"/></StackPanel>
+ </Grid>
+</Window>
+

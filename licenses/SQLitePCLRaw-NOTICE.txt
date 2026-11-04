@@ -1,0 +1,9 @@
+SQLitePCLRaw 2.1.12
+Components: bundle_e_sqlite3, core, lib.e_sqlite3, provider.e_sqlite3.
+Copyright 2014-2024 SourceGear, LLC
+Licensed under Apache-2.0; see Apache-2.0.txt.
+Source: https://github.com/ericsink/SQLitePCL.raw
+
+This distributor attribution is based on NuGet metadata, not represented as an upstream NOTICE.
+Additional upstream NOTICE, if present, must be preserved. Its existence has not been verified.
+SQLite itself is public domain: https://www.sqlite.org/copyright.html
