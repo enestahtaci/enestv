@@ -52,8 +52,17 @@ internal sealed class FullscreenWindow
         _window.WindowState = _state;
         WindowAppearance.Apply(_window);
     }
+    // LibVLCSharp hosts the video in a Win32 "static" child window. With nothing playing, Windows paints it with the
+    // system face colour (near white), which shows up whenever the window is resized, e.g. on entering fullscreen.
+    // Static controls ask their parent for a brush via WM_CTLCOLORSTATIC; answer with the player's black.
+    private static readonly IntPtr VideoBackground = CreateSolidBrush(0x00080605); // #050608 as COLORREF (0x00BBGGRR)
     private IntPtr WindowMessage(IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
+        if (message == 0x0138) // WM_CTLCOLORSTATIC
+        {
+            handled = true;
+            return VideoBackground;
+        }
         if (_active && message == 0x0024)
         {
             var bounds = Marshal.PtrToStructure<MinMaxInfo>(lParam);
@@ -68,6 +77,7 @@ internal sealed class FullscreenWindow
     [StructLayout(LayoutKind.Sequential)] private struct NativeRect { public int Left, Top, Right, Bottom; }
     [StructLayout(LayoutKind.Sequential)] private struct MonitorInfo { public int Size; public NativeRect Monitor, Work; public uint Flags; }
     [StructLayout(LayoutKind.Sequential)] private struct MinMaxInfo { public NativePoint Reserved, MaxSize, MaxPosition, MinTrackSize, MaxTrackSize; }
+    [DllImport("gdi32.dll")] private static extern IntPtr CreateSolidBrush(int color);
     [DllImport("user32.dll")] private static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint flags);
     [DllImport("user32.dll", CharSet = CharSet.Auto)] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
     [DllImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)] private static extern bool SetWindowPos(IntPtr hwnd, IntPtr insertAfter, int x, int y, int cx, int cy, uint flags);

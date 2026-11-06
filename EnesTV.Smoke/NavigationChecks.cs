@@ -15,8 +15,12 @@ internal static class NavigationChecks
 {
     private static void Check(bool condition, string name) { if (!condition) throw new InvalidOperationException(name); Console.WriteLine("PASS " + name); }
     private struct NativePoint { public int X, Y; }
+    private struct NativeRect { public int Left, Top, Right, Bottom; }
+    [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr window, out NativeRect rect);
     [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool SetCursorPos(int x, int y);
     [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool GetCursorPos(out NativePoint point);
+    [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern IntPtr WindowFromPoint(NativePoint point);
+    [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
     private static void KeyPress(Window window, Key key) => window.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(window), Environment.TickCount, key) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
     public static async Task FullscreenAsync(Window main, MainViewModel vm, string root)
     {
@@ -26,16 +30,24 @@ internal static class NavigationChecks
         Capture(overlay, Path.Combine(root, "fullscreen-overlay.png"));
         // The overlay receives real mouse input, so drive the real cursor: park it in a corner (away from the
         // controls), wait for auto-hide, then move it and expect the controls back.
+        // Use the overlay window's Win32 rectangle: it shares SetCursorPos' coordinate space even on mixed-DPI
+        // multi-monitor setups, where WPF's PointToScreen does not.
+        // Windows may start the test window behind whatever the user is working in (focus-stealing prevention);
+        // keep it on top while the real cursor is driven so the overlay is actually under the pointer.
+        main.Topmost = true;
         GetCursorPos(out var original);
-        var corner = overlay.PointToScreen(new Point(10, 10)); SetCursorPos((int)corner.X, (int)corner.Y);
+        GetWindowRect(new System.Windows.Interop.WindowInteropHelper(Window.GetWindow(overlay)).Handle, out var bounds);
+        SetCursorPos(bounds.Left + 10, bounds.Top + 10);
         var hideDeadline = DateTime.UtcNow.AddSeconds(8);
         while (controls.Visibility != Visibility.Collapsed && DateTime.UtcNow < hideDeadline) await Task.Delay(100);
         Check(controls.Visibility == Visibility.Collapsed, "Fullscreen controls auto-hide after inactivity");
-        var center = overlay.PointToScreen(new Point(overlay.ActualWidth / 2, overlay.ActualHeight / 3)); SetCursorPos((int)center.X, (int)center.Y);
+        var center = new NativePoint { X = (bounds.Left + bounds.Right) / 2, Y = bounds.Top + (bounds.Bottom - bounds.Top) / 3 };
+        SetCursorPos(center.X, center.Y);
         var showDeadline = DateTime.UtcNow.AddSeconds(2);
         while (controls.Visibility != Visibility.Visible && DateTime.UtcNow < showDeadline) await Task.Delay(50);
-        SetCursorPos(original.X, original.Y);
-        Check(controls.Visibility == Visibility.Visible, "Mouse movement reveals fullscreen controls");
+        GetWindowThreadProcessId(WindowFromPoint(center), out var ownerPid);
+        SetCursorPos(original.X, original.Y); main.Topmost = false;
+        Check(controls.Visibility == Visibility.Visible, $"Mouse movement reveals fullscreen controls (window under cursor belongs to this app: {ownerPid == Environment.ProcessId})");
         main.Activate(); Keyboard.Focus(overlay);
         var deadline = DateTime.UtcNow.AddSeconds(10);
         while (Keyboard.Modifiers != ModifierKeys.None && DateTime.UtcNow < deadline) await Task.Delay(100);
