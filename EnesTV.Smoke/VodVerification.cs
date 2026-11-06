@@ -77,7 +77,7 @@ internal static class VodVerification
                     Check(Math.Abs(video.ActualWidth - layout.ActualWidth) < 1 && Math.Abs(video.ActualHeight - layout.ActualHeight) < 1, "VOD fullscreen uses entire viewport");
                     Capture((FrameworkElement)window.FindName("VideoOverlay"), Path.Combine(root, "vod-fullscreen-overlay.png"));
                     window.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(window), Environment.TickCount, Key.Escape) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
-                    window.Close(); await Until(() => !window.IsVisible, "Close and save");
+                    window.Close(); Check(!window.IsVisible, "Closing hides the catalog at once"); await window.ShutdownCompleted.WaitAsync(TimeSpan.FromSeconds(15));
                     window = new VodWindow(main.Sources, main.Settings with { AutoReconnect = false }, VodKind.Movie) { Owner = app.MainWindow }; window.Show(); vm = window.ViewModel;
                     await Until(() => !vm.Busy && vm.Items.Count > 0, "Cached catalog"); vm.Selected = vm.Items[0]; await Until(() => vm.CanPlay, "Movie ready after reopen");
                     Check(vm.ResumeLabel.Contains("Kaldığınız yer"), "Resume offered after reopening window");
@@ -116,13 +116,15 @@ internal static class VodVerification
                     var errorCard = (Border)window.FindName("PlaybackErrorCard");
                     Check(vm.PlaybackError && errorCard.IsVisible, "Playback error is visible over the native player with retry action");
                     Capture((FrameworkElement)window.FindName("VideoOverlay"), Path.Combine(root, "vod-error-overlay.png"));
-                    window.Close(); await Until(() => !window.IsVisible, "VOD shutdown");
+                    window.Close(); await window.ShutdownCompleted.WaitAsync(TimeSpan.FromSeconds(15)); Check(!Application.Current.Windows.OfType<VodWindow>().Any(), "VOD shutdown releases the window");
                     await main.PlayChannelAsync(main.Channels[0]); await Until(() => main.Playback.Player.IsPlaying, "Live before navigation");
                     ((Button)app.MainWindow.FindName("MoviesNav")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                     await Until(() => Application.Current.Windows.OfType<VodWindow>().Any(), "Main movies button");
                     var fromNavigation = Application.Current.Windows.OfType<VodWindow>().Single();
                     Check(!main.Playback.Player.IsPlaying && fromNavigation.ViewModel.IsMovie, "Main Films button opens catalog and stops live stream");
-                    fromNavigation.Close(); await Until(() => !fromNavigation.IsVisible, "Return to live navigation");
+                    fromNavigation.Activate(); Keyboard.Focus(fromNavigation);
+                    fromNavigation.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(fromNavigation), Environment.TickCount, Key.Escape) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
+                    await Until(() => !fromNavigation.IsVisible, "Esc returns to live navigation"); await fromNavigation.ShutdownCompleted.WaitAsync(TimeSpan.FromSeconds(15));
                     var empty = new VodWindow([], main.Settings, VodKind.Movie) { Owner = app.MainWindow }; empty.Show(); await Task.Delay(300);
                     Check(empty.ViewModel.Status.Contains("Xtream hesabı"), "No account has actionable empty state"); Capture(empty, Path.Combine(root, "vod-no-account.png")); empty.Close(); await Until(() => !empty.IsVisible, "Empty window shutdown");
                     server.EmptyLiveCatalog = true; await main.RefreshAsync(main.Sources[0]);

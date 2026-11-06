@@ -30,7 +30,16 @@ public partial class MainWindow : Window
     private async void OnClosing(object? sender, CancelEventArgs e)
     {
         if (_closed) return; e.Cancel = true; if (_closing) return; _closing = true; IsEnabled = false;
-        try { Video.MediaPlayer = null; await _vm.DisposeAsync(); }
+        // Disappear at once; give libvlc a bounded time to release the stream before the process exits.
+        if (GetWindow(VideoOverlay) is { } overlay && overlay != this) overlay.Hide();
+        Hide();
+        try
+        {
+            Video.MediaPlayer = null;
+            var dispose = _vm.DisposeAsync().AsTask();
+            if (await Task.WhenAny(dispose, Task.Delay(TimeSpan.FromSeconds(10))) != dispose) App.Log.Write("app.shutdown.slow");
+            else await dispose;
+        }
         catch (Exception ex) { App.Log.Write("app.shutdown.failed", ex); }
         finally { _closed = true; Close(); }
     }
@@ -44,6 +53,7 @@ public partial class MainWindow : Window
     private void Settings_Click(object sender, RoutedEventArgs e) => new SettingsWindow(_vm) { Owner = this }.ShowDialog();
     private void Guide_Click(object sender, RoutedEventArgs e) => new GuideWindow(_vm) { Owner = this }.ShowDialog();
     private bool _openingVod;
+    private Task _vodShutdown = Task.CompletedTask;
     private async void Movies_Click(object sender, RoutedEventArgs e) => await OpenVodAsync(VodKind.Movie);
     private async void Series_Click(object sender, RoutedEventArgs e) => await OpenVodAsync(VodKind.Series);
     private async Task OpenVodAsync(VodKind kind)
@@ -52,8 +62,15 @@ public partial class MainWindow : Window
         try
         {
             // One active stream: avoid exceeding the provider's simultaneous connection limit.
-            await _vm.Playback.StopAsync();
-            new VodWindow(_vm.Sources, _vm.Settings, kind) { Owner = this }.ShowDialog();
+            // A stalled stream must not block the catalog; Stop keeps running in the background.
+            var stop = _vm.Playback.StopAsync();
+            if (await Task.WhenAny(stop, Task.Delay(TimeSpan.FromSeconds(3))) != stop) App.Log.Write("vod.open.stop.slow");
+            else await stop;
+            // A previous catalog window may still be saving progress and releasing its stream.
+            if (await Task.WhenAny(_vodShutdown, Task.Delay(TimeSpan.FromSeconds(5))) != _vodShutdown) App.Log.Write("vod.previous.shutdown.slow");
+            var window = new VodWindow(_vm.Sources, _vm.Settings, kind) { Owner = this };
+            _vodShutdown = window.ShutdownCompleted;
+            window.ShowDialog();
         }
         catch (Exception ex) { _vm.Error(ex); }
         finally { _openingVod = false; }
@@ -80,8 +97,13 @@ public partial class MainWindow : Window
         _numberTimer.Stop(); _channelDigits = ""; NumberBadge.Visibility = Visibility.Collapsed;
         if (_fullscreen) ShowFullscreenControls();
         else { _controlsTimer.Stop(); FullscreenControls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.Arrow; }
-        RootGrid.Focusable = true;
-        Keyboard.Focus(RootGrid);
+        FocusPlayer();
+    }
+    // One keyboard target per mode: the overlay window in fullscreen, the main window otherwise.
+    private void FocusPlayer()
+    {
+        if (_fullscreen) { Keyboard.Focus(VideoOverlay); return; }
+        Activate(); RootGrid.Focusable = true; Keyboard.Focus(RootGrid);
     }
     private async void Aspect_Changed(object sender, SelectionChangedEventArgs e)
     {

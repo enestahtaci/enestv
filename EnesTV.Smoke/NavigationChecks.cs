@@ -14,6 +14,9 @@ namespace EnesTV.Smoke;
 internal static class NavigationChecks
 {
     private static void Check(bool condition, string name) { if (!condition) throw new InvalidOperationException(name); Console.WriteLine("PASS " + name); }
+    private struct NativePoint { public int X, Y; }
+    [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool SetCursorPos(int x, int y);
+    [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool GetCursorPos(out NativePoint point);
     private static void KeyPress(Window window, Key key) => window.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(window), Environment.TickCount, key) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
     public static async Task FullscreenAsync(Window main, MainViewModel vm, string root)
     {
@@ -21,9 +24,17 @@ internal static class NavigationChecks
         Check(controls.Visibility == Visibility.Visible, "Fullscreen controls initially visible");
         Check(controls.DataContext == vm, "Native VLC overlay inherits view model");
         Capture(overlay, Path.Combine(root, "fullscreen-overlay.png"));
-        await Task.Delay(3400);
+        // The overlay receives real mouse input, so drive the real cursor: park it in a corner (away from the
+        // controls), wait for auto-hide, then move it and expect the controls back.
+        GetCursorPos(out var original);
+        var corner = overlay.PointToScreen(new Point(10, 10)); SetCursorPos((int)corner.X, (int)corner.Y);
+        var hideDeadline = DateTime.UtcNow.AddSeconds(8);
+        while (controls.Visibility != Visibility.Collapsed && DateTime.UtcNow < hideDeadline) await Task.Delay(100);
         Check(controls.Visibility == Visibility.Collapsed, "Fullscreen controls auto-hide after inactivity");
-        overlay.RaiseEvent(new MouseEventArgs(Mouse.PrimaryDevice, Environment.TickCount) { RoutedEvent = Mouse.MouseMoveEvent });
+        var center = overlay.PointToScreen(new Point(overlay.ActualWidth / 2, overlay.ActualHeight / 3)); SetCursorPos((int)center.X, (int)center.Y);
+        var showDeadline = DateTime.UtcNow.AddSeconds(2);
+        while (controls.Visibility != Visibility.Visible && DateTime.UtcNow < showDeadline) await Task.Delay(50);
+        SetCursorPos(original.X, original.Y);
         Check(controls.Visibility == Visibility.Visible, "Mouse movement reveals fullscreen controls");
         main.Activate(); Keyboard.Focus(overlay);
         var deadline = DateTime.UtcNow.AddSeconds(10);

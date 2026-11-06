@@ -26,7 +26,7 @@ public partial class VodWindow : Window
         Subtitles.ItemsSource = new[] { new TrackOption(-2, "Altyazı yok") }; Subtitles.SelectedIndex = 0;
         _tracksUpdating = false;
         _tick.Tick += async (_, _) => { try { await ViewModel.TickAsync(); } catch (Exception ex) { ViewModel.Error(ex); } };
-        _hide.Tick += (_, _) => { if (OverlayControls.IsMouseOver || Mouse.Captured != null) return; _hide.Stop(); OverlayControls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.None; };
+        _hide.Tick += (_, _) => { if (OverlayControls.IsMouseOver || Mouse.Captured != null) return; _hide.Stop(); if (OverlayControls.IsKeyboardFocusWithin) Keyboard.Focus(VideoOverlay); OverlayControls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.None; };
         Loaded += async (_, _) => { _tick.Start(); await ViewModel.InitializeAsync(); };
         ViewModel.Playback.TracksChanged += () => { if (!Dispatcher.HasShutdownStarted) Dispatcher.BeginInvoke(RefreshTracks); };
         Closing += OnClosing;
@@ -34,10 +34,23 @@ public partial class VodWindow : Window
     private async void OnClosing(object? sender, CancelEventArgs e)
     {
         if (_closed) return; e.Cancel = true; if (_closing) return; _closing = true; _tick.Stop(); _hide.Stop(); IsEnabled = false;
-        try { Video.MediaPlayer = null; await ViewModel.DisposeAsync(); }
+        // Hiding ends ShowDialog, so the user is back on live TV at once even if libvlc's Stop is slow.
+        // The window (and its video HWND) stays alive, hidden, until playback is released.
+        if (GetWindow(VideoOverlay) is { } overlay && overlay != this) overlay.Hide();
+        Hide();
+        try
+        {
+            Video.MediaPlayer = null;
+            var dispose = ViewModel.DisposeAsync().AsTask();
+            if (await Task.WhenAny(dispose, Task.Delay(TimeSpan.FromSeconds(10))) != dispose) App.Log.Write("vod.shutdown.slow");
+            await dispose;
+        }
         catch (Exception ex) { App.Log.Write("vod.shutdown.failed", ex); }
-        finally { _closed = true; Close(); }
+        finally { _closed = true; Close(); _shutdown.TrySetResult(); }
     }
+    private readonly TaskCompletionSource _shutdown = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    /// <summary>Completes after progress is saved and playback is released (the window hides earlier).</summary>
+    public Task ShutdownCompleted => _shutdown.Task;
     private void Back_Click(object sender, RoutedEventArgs e) => Close();
     private void Movies_Click(object sender, RoutedEventArgs e) => ViewModel.Kind = VodKind.Movie;
     private void Series_Click(object sender, RoutedEventArgs e) => ViewModel.Kind = VodKind.Series;
@@ -66,14 +79,28 @@ public partial class VodWindow : Window
         Grid.SetRow(ContentPanel, _fullscreen ? 0 : 1); Grid.SetRowSpan(ContentPanel, _fullscreen ? 3 : 1);
         if (_fullscreen) { _fullscreenWindow.Enter(); ShowControls(); }
         else { _fullscreenWindow.Exit(); _hide.Stop(); OverlayControls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.Arrow; }
-        VideoOverlay.Focus();
+        FocusPlayer();
+    }
+    // One keyboard target per mode: the overlay window in fullscreen, this window otherwise.
+    private void FocusPlayer()
+    {
+        if (_fullscreen) { Keyboard.Focus(VideoOverlay); return; }
+        Activate(); Root.Focusable = true; Keyboard.Focus(Root);
+    }
+    private void Overlay_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        ShowControls();
+        if (e.OriginalSource == VideoOverlay) FocusPlayer();
     }
     private void ShowControls() { if (!_fullscreen) return; OverlayControls.Visibility = Visibility.Visible; VideoOverlay.Cursor = Cursors.Arrow; _hide.Stop(); _hide.Start(); }
     private void Overlay_MouseMove(object sender, MouseEventArgs e) { var p = e.GetPosition(VideoOverlay); if (_pointer != p) { _pointer = p; ShowControls(); } }
     private async void Window_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Handled || _closing) return;
-        if (e.Key == Key.F11 || e.Key == Key.Escape && _fullscreen) { e.Handled = true; if (!e.IsRepeat) ToggleFullscreen(); return; }
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (key == Key.F11 || key == Key.Escape && _fullscreen) { e.Handled = true; if (!e.IsRepeat) ToggleFullscreen(); return; }
+        // Esc returns to live TV, except while typing or choosing from a list (Esc closes the drop-down there).
+        if (key == Key.Escape && Keyboard.FocusedElement is not (TextBoxBase or ComboBox or ComboBoxItem)) { e.Handled = true; if (!e.IsRepeat) Close(); return; }
         if (Keyboard.FocusedElement is TextBoxBase or ComboBox or ComboBoxItem or Slider or ButtonBase) return;
         if (Keyboard.Modifiers != ModifierKeys.None) return;
         try

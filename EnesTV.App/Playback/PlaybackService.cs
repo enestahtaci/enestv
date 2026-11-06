@@ -35,7 +35,8 @@ public sealed class PlaybackService : IAsyncDisposable
     public PlaybackService(SafeLog log, bool onDemand = false)
     {
         _log = log; _onDemand = onDemand;
-        Player = new MediaPlayer(_vlc) { EnableHardwareDecoding = true, Volume = 75 };
+        // Keep mouse and keyboard input in WPF: VLC's video window runs on its own thread and must not take focus.
+        Player = new MediaPlayer(_vlc) { EnableHardwareDecoding = true, Volume = 75, EnableMouseInput = false, EnableKeyInput = false };
         Player.Playing += (_, _) => { _paused = false; OnEvent(PlaybackState.Playing, _onDemand ? "Oynatılıyor" : "Canlı yayın", true); };
         Player.Paused += (_, _) => { _paused = true; OnEvent(PlaybackState.Paused, "Duraklatıldı"); };
         Player.Buffering += (_, e) => { if (!_paused) OnEvent(e.Cache < 100 ? PlaybackState.Buffering : PlaybackState.Playing, e.Cache < 100 ? "Yayın arabelleğe alınıyor…" : _onDemand ? "Oynatılıyor" : "Canlı yayın"); };

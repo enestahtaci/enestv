@@ -45,7 +45,7 @@ public partial class MainWindow
     private void Overlay_MouseDown(object sender, MouseButtonEventArgs e)
     {
         ShowFullscreenControls();
-        if (e.OriginalSource == VideoOverlay) Keyboard.Focus(VideoOverlay);
+        if (e.OriginalSource == VideoOverlay) FocusPlayer();
     }
     private void Organization_Click(object sender, RoutedEventArgs e)
     {
