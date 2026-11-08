@@ -32,6 +32,16 @@ dotnet test EnesTV.Tests -c Release
 Inno Setup is required to build the installer. Pass the installed ISCC.exe path to `Installer/Build-Setup.ps1` using `-InnoCompiler`. The script publishes a self-contained x64 application and builds the installer using a fresh staging directory.
 These commands are documentation; they were not run during Stage 2 preparation. [Release checklist](RELEASE-CHECKLIST.md).
 
+### 1.4.0 — single window, fullscreen fixes
+
+Update using `enestv-Setup-1.4.0-x64.exe`. Close any running instance of enestv first. Accounts, favorites, history and playback positions are preserved; the database schema does not change.
+
+- **Movies** and **Series** no longer open a separate window. Selecting them in the left menu shows the catalog in the middle column and movie controls and details under the same player on the right. The app still starts in Live TV.
+- Only one stream is open at a time: switching to Movies/Series stops live TV, returning to Live TV stops the movie (the playback position is saved). In Movies/Series, Esc returns to Live TV.
+- The empty player screen is now useful: **Continue** for the last watched channel, shortcuts to recent and favorite channels, and **Add source** when no source exists. Stop also returns to this screen.
+- Fixed in fullscreen: Esc not working after clicking the video, controls not reappearing on mouse movement, and the empty player turning white.
+- An unresponsive stream no longer locks the app while stopping, switching episodes or closing.
+
 ### 1.3.0 — interface and usability improvements
 
 Update using `enestv-Setup-1.3.0-x64.exe`. Close any running instance of enestv first. Existing accounts, favorites, history and playback positions are preserved; this version does not change the database schema.

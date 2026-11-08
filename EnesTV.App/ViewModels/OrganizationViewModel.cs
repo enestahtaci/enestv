@@ -39,6 +39,7 @@ public sealed partial class MainViewModel
         Raise(nameof(FavoriteLists)); Raise(nameof(SelectedFavoriteList)); Raise(nameof(Layout));
         if (PlayingItem != null) PlayingItem = _all.FirstOrDefault(x => x.Channel.Id == PlayingItem.Channel.Id) ?? PlayingItem;
         Raise(nameof(CurrentName));
+        UpdateQuickAccess();
     }
     public async Task SaveOrganizationAsync(LibraryLayout edited)
     {

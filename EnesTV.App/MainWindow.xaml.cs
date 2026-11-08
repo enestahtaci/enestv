@@ -17,7 +17,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent(); DataContext = _vm;
-        InitializeNavigationUi();
+        InitializeNavigationUi(); InitializeVodUi();
         _fullscreenWindow = new FullscreenWindow(this);
         _updatingTracks = true;
         AudioTracks.ItemsSource = new[] { new TrackOption(-2, "Ses izi yok") }; AudioTracks.SelectedIndex = 0;
@@ -25,8 +25,12 @@ public partial class MainWindow : Window
         _updatingTracks = false;
         Loaded += async (_, _) => { try { await _vm.InitializeAsync(); App.Log.Write("app.ready"); } catch (Exception ex) { _vm.Error(ex); } };
         Closing += OnClosing;
-        _vm.Playback.TracksChanged += () => { if (!Dispatcher.HasShutdownStarted) Dispatcher.BeginInvoke(() => RefreshTracks()); };
+        _vm.Playback.TracksChanged += () => { if (!_vm.IsVod) QueueRefreshTracks(); };
+        _vm.ActiveTracksChanged += QueueRefreshTracks;
     }
+    private void QueueRefreshTracks() { if (!Dispatcher.HasShutdownStarted) Dispatcher.BeginInvoke(() => RefreshTracks()); }
+    // Errors belong to the visible mode's status line.
+    private void ReportError(Exception ex) { if (_vm.IsVod && _vm.Vod is { } vod) vod.Error(ex); else _vm.Error(ex); }
     private async void OnClosing(object? sender, CancelEventArgs e)
     {
         if (_closed) return; e.Cancel = true; if (_closing) return; _closing = true; IsEnabled = false;
@@ -52,29 +56,6 @@ public partial class MainWindow : Window
     }
     private void Settings_Click(object sender, RoutedEventArgs e) => new SettingsWindow(_vm) { Owner = this }.ShowDialog();
     private void Guide_Click(object sender, RoutedEventArgs e) => new GuideWindow(_vm) { Owner = this }.ShowDialog();
-    private bool _openingVod;
-    private Task _vodShutdown = Task.CompletedTask;
-    private async void Movies_Click(object sender, RoutedEventArgs e) => await OpenVodAsync(VodKind.Movie);
-    private async void Series_Click(object sender, RoutedEventArgs e) => await OpenVodAsync(VodKind.Series);
-    private async Task OpenVodAsync(VodKind kind)
-    {
-        if (_openingVod || _closing) return; _openingVod = true;
-        try
-        {
-            // One active stream: avoid exceeding the provider's simultaneous connection limit.
-            // A stalled stream must not block the catalog; Stop keeps running in the background.
-            var stop = _vm.Playback.StopAsync();
-            if (await Task.WhenAny(stop, Task.Delay(TimeSpan.FromSeconds(3))) != stop) App.Log.Write("vod.open.stop.slow");
-            else await stop;
-            // A previous catalog window may still be saving progress and releasing its stream.
-            if (await Task.WhenAny(_vodShutdown, Task.Delay(TimeSpan.FromSeconds(5))) != _vodShutdown) App.Log.Write("vod.previous.shutdown.slow");
-            var window = new VodWindow(_vm.Sources, _vm.Settings, kind) { Owner = this };
-            _vodShutdown = window.ShutdownCompleted;
-            window.ShowDialog();
-        }
-        catch (Exception ex) { _vm.Error(ex); }
-        finally { _openingVod = false; }
-    }
     private void Fullscreen_Click(object sender, RoutedEventArgs e) => ToggleFullscreen();
     private void ToggleFullscreen()
     {
@@ -93,10 +74,11 @@ public partial class MainWindow : Window
         RootGrid.Margin = new Thickness(_fullscreen ? 0 : 24);
         VideoFrame.CornerRadius = new CornerRadius(_fullscreen ? 0 : 14);
         Grid.SetRow(PlayerPanel, _fullscreen ? 0 : 1); Grid.SetColumn(PlayerPanel, _fullscreen ? 0 : 2); Grid.SetRowSpan(PlayerPanel, _fullscreen ? 3 : 1); Grid.SetColumnSpan(PlayerPanel, _fullscreen ? 3 : 1);
+        ApplyPlayerRows();
         if (_fullscreen) _fullscreenWindow.Enter(); else _fullscreenWindow.Exit();
         _numberTimer.Stop(); _channelDigits = ""; NumberBadge.Visibility = Visibility.Collapsed;
         if (_fullscreen) ShowFullscreenControls();
-        else { _controlsTimer.Stop(); FullscreenControls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.Arrow; }
+        else { _controlsTimer.Stop(); FullscreenControls.Visibility = Visibility.Collapsed; VodOverlayControls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.Arrow; }
         FocusPlayer();
     }
     // One keyboard target per mode: the overlay window in fullscreen, the main window otherwise.
@@ -108,18 +90,18 @@ public partial class MainWindow : Window
     private async void Aspect_Changed(object sender, SelectionChangedEventArgs e)
     {
         if (_vm == null || !IsLoaded) return;
-        try { await _vm.Playback.SetAspectAsync(Aspect.SelectedIndex == 0 ? null : ((ComboBoxItem)Aspect.SelectedItem).Content.ToString()); } catch (Exception ex) { _vm.Error(ex); }
+        try { await _vm.ActivePlayback.SetAspectAsync(Aspect.SelectedIndex == 0 ? null : ((ComboBoxItem)Aspect.SelectedItem).Content.ToString()); } catch (Exception ex) { ReportError(ex); }
     }
     private async void Audio_Changed(object sender, SelectionChangedEventArgs e)
-    { if (!_updatingTracks && AudioTracks.SelectedItem is TrackOption { Id: >= -1 } track) { try { await _vm.Playback.SetAudioAsync(track.Id); } catch (Exception ex) { _vm.Error(ex); } } }
+    { if (!_updatingTracks && AudioTracks.SelectedItem is TrackOption { Id: >= -1 } track) { try { await _vm.ActivePlayback.SetAudioAsync(track.Id); } catch (Exception ex) { ReportError(ex); } } }
     private async void Subtitle_Changed(object sender, SelectionChangedEventArgs e)
-    { if (!_updatingTracks && SubtitleTracks.SelectedItem is TrackOption { Id: >= -1 } track) { try { await _vm.Playback.SetSubtitleAsync(track.Id); } catch (Exception ex) { _vm.Error(ex); } } }
+    { if (!_updatingTracks && SubtitleTracks.SelectedItem is TrackOption { Id: >= -1 } track) { try { await _vm.ActivePlayback.SetSubtitleAsync(track.Id); } catch (Exception ex) { ReportError(ex); } } }
     private async void RefreshTracks()
     {
         if (_closing) return;
         try
         {
-            var tracks = await _vm.Playback.GetTracksAsync(); if (_closing || tracks == null) return;
+            var tracks = await _vm.ActivePlayback.GetTracksAsync(); if (_closing || tracks == null) return;
             _updatingTracks = true;
             var audio = tracks.Audio.Length == 0 ? new[] { new TrackOption(-2, "Ses izi yok") } : tracks.Audio;
             var subtitles = tracks.Subtitles.Length == 0 ? new[] { new TrackOption(-2, "Altyazı yok") } : tracks.Subtitles;
@@ -127,7 +109,7 @@ public partial class MainWindow : Window
             AudioTracks.SelectedItem = audio.FirstOrDefault(t => t.Id == tracks.AudioId) ?? audio[0];
             SubtitleTracks.SelectedItem = subtitles.FirstOrDefault(t => t.Id == tracks.SubtitleId) ?? subtitles[0];
         }
-        catch (Exception ex) { _vm.Error(ex); }
+        catch (Exception ex) { ReportError(ex); }
         finally { _updatingTracks = false; }
     }
 }

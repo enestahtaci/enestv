@@ -21,7 +21,7 @@ public sealed partial class MainViewModel
                 return;
             }
             await App.Store.SetFavoriteAsync(item.Channel.Id, !item.Favorite, _lifetime.Token);
-            item.Favorite = !item.Favorite;
+            item.Favorite = !item.Favorite; UpdateQuickAccess();
             if (Section == "Favorites") await FilterAsync(false);
         }, Error);
         Playback.Started += id => Dispatch(() => Observe(RecordRecentAsync(id)));
@@ -30,7 +30,7 @@ public sealed partial class MainViewModel
     {
         if (_recent.FirstOrDefault() == id || !_all.Any(x => x.Channel.Id == id)) return;
         await App.Store.AddRecentAsync(id, _lifetime.Token);
-        _recent = new[] { id }.Concat(_recent.Where(x => x != id)).Take(20).ToArray();
+        _recent = new[] { id }.Concat(_recent.Where(x => x != id)).Take(20).ToArray(); UpdateQuickAccess();
         if (Section == "Recent") await FilterAsync(false);
     }
     partial void ApplySettings(UserSettings settings)

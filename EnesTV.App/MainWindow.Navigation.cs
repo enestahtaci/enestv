@@ -18,14 +18,25 @@ public partial class MainWindow
     {
         _controlsTimer.Tick += (_, _) =>
         {
-            if (FullscreenControls.IsMouseOver || Mouse.Captured != null) return;
+            var controls = ActiveFullscreenControls;
+            if (controls.IsMouseOver || Mouse.Captured != null) return;
             _controlsTimer.Stop();
             if (!_fullscreen) return;
-            if (FullscreenControls.IsKeyboardFocusWithin) Keyboard.Focus(VideoOverlay);
-            FullscreenControls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.None;
+            if (controls.IsKeyboardFocusWithin) Keyboard.Focus(VideoOverlay);
+            controls.Visibility = Visibility.Collapsed; VideoOverlay.Cursor = Cursors.None;
         };
         _numberTimer.Tick += async (_, _) => await CommitChannelNumberAsync();
-        _vm.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(_vm.PlayingItem)) CancelChannelNumber(); };
+        _vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(_vm.PlayingItem)) CancelChannelNumber();
+            if (e.PropertyName == nameof(_vm.IsVod))
+            {
+                CancelChannelNumber();
+                FullscreenControls.Visibility = VodOverlayControls.Visibility = Visibility.Collapsed;
+                ShowFullscreenControls();
+                Aspect.SelectedIndex = 0; // the other mode's player starts with automatic aspect ratio
+            }
+        };
         Closed += (_, _) => { _controlsTimer.Stop(); _numberTimer.Stop(); };
         Deactivated += (_, _) => CancelChannelNumber();
     }
@@ -33,7 +44,7 @@ public partial class MainWindow
     private void ShowFullscreenControls()
     {
         if (!_fullscreen) return;
-        FullscreenControls.Visibility = Visibility.Visible; VideoOverlay.Cursor = Cursors.Arrow;
+        ActiveFullscreenControls.Visibility = Visibility.Visible; VideoOverlay.Cursor = Cursors.Arrow;
         _controlsTimer.Stop(); _controlsTimer.Start();
     }
     private void Overlay_MouseMove(object sender, MouseEventArgs e)
@@ -67,6 +78,7 @@ public partial class MainWindow
         {
             if (!e.IsRepeat) ToggleFullscreen(); e.Handled = true; return;
         }
+        if (_vm.IsVod) { await VodKeyDownAsync(e, key); return; }
         // Keep typing and native keyboard behavior intact in editors and selection controls.
         if (Keyboard.FocusedElement is TextBoxBase or PasswordBox or ComboBox or ComboBoxItem or Slider) return;
         var modifiers = Keyboard.Modifiers;

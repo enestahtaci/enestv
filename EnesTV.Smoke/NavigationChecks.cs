@@ -21,6 +21,7 @@ internal static class NavigationChecks
     [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool GetCursorPos(out NativePoint point);
     [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern IntPtr WindowFromPoint(NativePoint point);
     [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
+    private static string SafeProcessName(uint pid) { try { return System.Diagnostics.Process.GetProcessById((int)pid).ProcessName; } catch { return "unknown"; } }
     private static void KeyPress(Window window, Key key) => window.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(window), Environment.TickCount, key) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
     public static async Task FullscreenAsync(Window main, MainViewModel vm, string root)
     {
@@ -36,18 +37,24 @@ internal static class NavigationChecks
         // keep it on top while the real cursor is driven so the overlay is actually under the pointer.
         main.Topmost = true;
         GetCursorPos(out var original);
-        GetWindowRect(new System.Windows.Interop.WindowInteropHelper(Window.GetWindow(overlay)).Handle, out var bounds);
+        var overlayHandle = new System.Windows.Interop.WindowInteropHelper(Window.GetWindow(overlay)).Handle;
+        GetWindowRect(overlayHandle, out var bounds);
         SetCursorPos(bounds.Left + 10, bounds.Top + 10);
         var hideDeadline = DateTime.UtcNow.AddSeconds(8);
         while (controls.Visibility != Visibility.Collapsed && DateTime.UtcNow < hideDeadline) await Task.Delay(100);
         Check(controls.Visibility == Visibility.Collapsed, "Fullscreen controls auto-hide after inactivity");
         var center = new NativePoint { X = (bounds.Left + bounds.Right) / 2, Y = bounds.Top + (bounds.Bottom - bounds.Top) / 3 };
-        SetCursorPos(center.X, center.Y);
-        var showDeadline = DateTime.UtcNow.AddSeconds(2);
-        while (controls.Visibility != Visibility.Visible && DateTime.UtcNow < showDeadline) await Task.Delay(50);
-        GetWindowThreadProcessId(WindowFromPoint(center), out var ownerPid);
+        // Nudge the cursor a few times: a single move can be lost if the user touches the mouse at the same moment.
+        var showDeadline = DateTime.UtcNow.AddSeconds(3); var step = 0;
+        while (controls.Visibility != Visibility.Visible && DateTime.UtcNow < showDeadline)
+        {
+            SetCursorPos(center.X + step % 2 * 12, center.Y); step++;
+            await Task.Delay(150);
+        }
+        var under = WindowFromPoint(center); GetWindowThreadProcessId(under, out var ownerPid);
+        var ownerName = ownerPid == Environment.ProcessId ? (under == overlayHandle ?"this app (overlay)" : "this app (not the overlay)") : SafeProcessName(ownerPid);
         SetCursorPos(original.X, original.Y); main.Topmost = false;
-        Check(controls.Visibility == Visibility.Visible, $"Mouse movement reveals fullscreen controls (window under cursor belongs to this app: {ownerPid == Environment.ProcessId})");
+        Check(controls.Visibility == Visibility.Visible, $"Mouse movement reveals fullscreen controls (window under cursor: {ownerName})");
         main.Activate(); Keyboard.Focus(overlay);
         var deadline = DateTime.UtcNow.AddSeconds(10);
         while (Keyboard.Modifiers != ModifierKeys.None && DateTime.UtcNow < deadline) await Task.Delay(100);

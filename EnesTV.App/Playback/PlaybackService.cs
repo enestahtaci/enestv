@@ -155,7 +155,7 @@ public sealed class PlaybackService : IAsyncDisposable
     {
         var generation = Interlocked.Increment(ref _generation); _request.Cancel(); _acceptEvents = false; _channel = null;
         await WithPlayerAsync(p => { if (generation == _generation) { p.Stop(); p.Media = null; _media?.Dispose(); _media = null; } return true; });
-        if (generation == _generation) Publish(PlaybackState.Idle, "Bir kanal seçin");
+        if (generation == _generation) Publish(PlaybackState.Idle, "Durduruldu");
     }
     public Task TogglePauseAsync() => WithPlayerAsync(p => { p.Pause(); return true; });
     public Task SetVolumeAsync(int value) => WithPlayerAsync(p => { p.Volume = Math.Clamp(value, 0, 100); return true; });

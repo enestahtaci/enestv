@@ -51,10 +51,21 @@ public sealed partial class MainViewModel : Observable, IAsyncDisposable
     public ChannelItem? Selected { get => _selected; set => Set(ref _selected, value); }
     private ChannelItem? _playingItem;
     public ChannelItem? PlayingItem { get => _playingItem; private set { Set(ref _playingItem, value); Raise(nameof(CurrentName)); UpdateCurrentEpg(); } }
-    public string CurrentName => PlayingItem?.Name ?? "İzlemek için bir kanal seçin";
-    public string Section { get => _section; set { if (Set(ref _section, value)) { Raise(nameof(SectionTitle)); Raise(nameof(SectionDescription)); UpdateEmptyState(); QueueFilter(); } } }
-    public string SectionTitle => Section switch { "Favorites" => "Favoriler", "Recent" => "Son izlenenler", "Categories" => "Kategoriler", _ => "Canlı yayınlar" };
-    public string SectionDescription => Section switch { "Favorites" => "Sevdiğin kanallar, elinin altında.", "Recent" => "Son izlediğin 20 kanal.", "Categories" => "İzlemek istediğin türe göz at.", _ => "Kendi kaynakların, tek bir yerde." };
+    public string CurrentName => PlayingItem?.Name ?? "Kanal seçilmedi";
+    public string Section
+    {
+        get => _section;
+        set
+        {
+            var wasVod = IsVodSection(_section);
+            if (!Set(ref _section, value)) return;
+            Raise(nameof(SectionTitle)); Raise(nameof(SectionDescription)); Raise(nameof(IsVod)); UpdateEmptyState();
+            if (!IsVod) QueueFilter();
+            if (wasVod || IsVod) Observe(SwitchModeAsync(wasVod));
+        }
+    }
+    public string SectionTitle => Section switch { "Favorites" => "Favoriler", "Recent" => "Son izlenenler", "Categories" => "Kategoriler", "Movies" => "Filmler", "Series" => "Diziler", _ => "Canlı yayınlar" };
+    public string SectionDescription => Section switch { "Favorites" => "Sevdiğin kanallar, elinin altında.", "Recent" => "Son izlediğin 20 kanal.", "Categories" => "İzlemek istediğin türe göz at.", "Movies" => "Film kütüphanen, kaldığın yerden.", "Series" => "Dizilerin, sezon sezon.", _ => "Kendi kaynakların, tek bir yerde." };
     public bool HasFilter => !string.IsNullOrWhiteSpace(Search) || Category != "Tüm kategoriler";
     public bool NeedsSource => Sources.Count == 0 && !Busy;
     public string EmptyTitle => Busy ? "Kanallar yükleniyor" : HasFilter ? "Sonuç bulunamadı" : NeedsSource ? "İlk kaynağını ekle" : Section switch { "Favorites" => "Favorilerin burada görünecek", "Recent" => "Henüz bir kanal izlemedin", _ => "Gösterilecek kanal yok" };
@@ -68,7 +79,7 @@ public sealed partial class MainViewModel : Observable, IAsyncDisposable
     public AsyncCommand NavigateCommand { get; }
     public AsyncCommand RefreshCommand { get; }
     public AsyncCommand CancelCommand { get; }
-    private string _playbackText = "Bir kanal seçin";
+    private string _playbackText = "Hazır";
     public string PlaybackText { get => _playbackText; private set => Set(ref _playbackText, value); }
     private PlaybackState _playbackState;
     public string PauseIcon => _playbackState is PlaybackState.Playing or PlaybackState.Buffering ? "Pause" : "Play";
@@ -82,7 +93,11 @@ public sealed partial class MainViewModel : Observable, IAsyncDisposable
         EnesTV.App.Views.LazyLogo.Cache = new EnesTV.App.Services.LogoCache(_network, System.IO.Path.Combine(App.DataRoot, "logos"));
         PlayCommand = new(async p => { if (p is ChannelItem item) await PlayChannelAsync(item); }, Error, true);
         PauseCommand = new(_ => Playback.TogglePauseAsync(), Error);
-        StopCommand = new(_ => Playback.StopAsync(), Error);
+        StopCommand = new(async _ =>
+        {
+            if (PlayingItem != null) _previousChannelId = PlayingItem.Channel.Id;
+            await Playback.StopAsync(); PlayingItem = null; // back to the quick-start screen
+        }, Error);
         ReconnectCommand = new(_ => PlayingItem == null ? Task.CompletedTask : Playback.PlayAsync(PlayingItem.Channel), Error);
         NavigateCommand = new(p => { Section = p?.ToString() ?? "Live TV"; return Task.CompletedTask; }, Error);
         RefreshCommand = new(_ => SelectedSource == null ? Task.CompletedTask : RefreshAsync(SelectedSource), Error);
@@ -171,6 +186,7 @@ public sealed partial class MainViewModel : Observable, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _lifetime.Cancel(); _loading?.Cancel(); _filtering?.Cancel();
+        if (Vod != null) await Vod.DisposeAsync();
         await Playback.DisposeAsync(); _network.Dispose(); _loading?.Dispose(); _filtering?.Dispose(); _lifetime.Dispose();
     }
 }

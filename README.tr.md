@@ -32,6 +32,16 @@ dotnet test EnesTV.Tests -c Release
 Kurulum için Inno Setup gerekir. `Installer/Build-Setup.ps1` betiğine `-InnoCompiler` ile kurulu ISCC.exe yolunu verin. Betik bağımsız x64 publish ve installer üretimini yürütür; taze staging dizini kullanır.
 Bu komutlar dokümantasyondur; Aşama 2 hazırlığında çalıştırılmadı. [Release kontrol listesi](RELEASE-CHECKLIST.md).
 
+### 1.4.0 — tek pencere, tam ekran düzeltmeleri
+
+`enestv-Setup-1.4.0-x64.exe` ile güncelleyin. Önce açık enestv'yi kapatın. Hesaplar, favoriler, geçmiş ve izleme konumları korunur; veritabanı şeması değişmez.
+
+- **Filmler** ve **Diziler** artık ayrı pencere açmaz. Sol menüden seçildiğinde orta bölümde katalog, sağda aynı oynatıcı ile film kontrolleri ve detaylar görünür. Uygulama yine Canlı TV ile açılır.
+- Aynı anda tek yayın açık kalır: Filmler/Diziler'e geçince canlı yayın, Canlı TV'ye dönünce film durur (izleme konumu kaydedilir). Filmler/Diziler'de Esc Canlı TV'ye döner.
+- Boş oynatıcı ekranı işe yarar hale geldi: son izlenen kanal için **Devam et**, son izlenen ve favori kanallara kısayollar, kaynak yoksa **Kaynak ekle**. Durdur'a basınca da bu ekran gelir.
+- Tam ekranda videoya tıklayınca Esc'nin çalışmaması, fareyi oynatınca kontrol çubuğunun geri gelmemesi ve boş oynatıcının beyaz görünmesi düzeltildi.
+- Yanıt vermeyen bir yayın artık durdurma, bölüm değiştirme ve kapatma sırasında uygulamayı kilitlemez.
+
 ### 1.3.0 — arayüz ve kullanım düzenlemeleri
 
 `enestv-Setup-1.3.0-x64.exe` ile güncelleyin. Önce açık enestv'yi kapatın. Mevcut hesaplar, favoriler, geçmiş ve izleme konumları korunur; bu sürüm veritabanı şemasını değiştirmez.
