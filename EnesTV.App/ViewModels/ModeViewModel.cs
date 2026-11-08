@@ -69,7 +69,7 @@ public sealed partial class MainViewModel
         bool Visible(ChannelItem x) => !x.Hidden && !Layout.HiddenCategories.Contains(x.Category);
         var byId = _all.GroupBy(x => x.Channel.Id).ToDictionary(x => x.Key, x => x.First());
         var ordered = _recent.Select(id => byId.GetValueOrDefault(id)).OfType<ChannelItem>()
-            .Concat(_all.Where(x => x.Favorite)).Where(Visible).Distinct().Take(5).ToArray();
+            .Concat(_all.Where(x => x.Favorite)).Where(Visible).Distinct().Take(4).ToArray(); // "Continue" + three shortcuts
         ResumeChannel = ordered.FirstOrDefault();
         QuickChannels = ordered.Skip(1).ToArray();
     }

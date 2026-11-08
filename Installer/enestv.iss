@@ -29,12 +29,16 @@ VersionInfoDescription=enestv Windows Kurulumu
 VersionInfoProductName=enestv
 WizardStyle=modern dark includetitlebar
 WizardSizePercent=110
-WizardImageFile=
+; App logo centred on the dark welcome/finish panel (not stretched); Setup picks the size that fits the display DPI.
+WizardImageFile=wizard-logo-120.png,wizard-logo-240.png
+WizardImageStretch=no
 WizardImageBackColor=#101216
-WizardSmallImageFile=..\EnesTV.App\Assets\enestv-icon.png
+; Small logo on the inner pages; sized copies so it is not lost by scaling a 1254 px image down.
+WizardSmallImageFile=wizard-small-58.png,wizard-small-116.png
 WizardSmallImageBackColor=#101216
 LicenseFile=..\LICENSE
-InfoAfterFile=..\THIRD-PARTY-NOTICES.md
+; Third-party notices are shown before installing (after the licence), where "ready to install" wording applies.
+InfoBeforeFile=..\THIRD-PARTY-NOTICES.md
 DisableWelcomePage=no
 DisableDirPage=no
 Compression=lzma2
@@ -67,34 +71,63 @@ Source: "..\licenses\*"; DestDir: "{app}\licenses"; Flags: ignoreversion recurse
 Name: "{autoprograms}\enestv"; Filename: "{app}\enestv.exe"; WorkingDir: "{app}"; IconFilename: "{app}\enestv.exe"; AppUserModelID: "Enes.enestv"
 Name: "{autodesktop}\enestv"; Filename: "{app}\enestv.exe"; WorkingDir: "{app}"; IconFilename: "{app}\enestv.exe"; Tasks: desktopicon; AppUserModelID: "Enes.enestv"
 
-[Run]
-Filename: "{app}\enestv.exe"; Description: "enestv'yi şimdi aç"; Flags: nowait postinstall skipifsilent unchecked
-
 [Code]
+{ The finish page has two options drawn as the same kind of check box, so they line up exactly.
+  "Open enestv" is not a [Run] postinstall entry: Inno's run list draws its box flush left with no gap before the
+  text, which never aligned with a regular check box. Both options are handled on Finish below. }
 var
-  ThanksCheckBox: TNewCheckBox;
+  OpenCheckBox, ThanksCheckBox: TNewCheckBox;
+
+function CreateFinishCheckBox(const Caption: String): TNewCheckBox;
+begin
+  Result := TNewCheckBox.Create(WizardForm);
+  Result.Parent := WizardForm.FinishedPage;
+  Result.Caption := Caption;
+  Result.Checked := True;
+  Result.Visible := False;
+end;
 
 procedure InitializeWizard;
 begin
-  ThanksCheckBox := TNewCheckBox.Create(WizardForm);
-  ThanksCheckBox.Parent := WizardForm.FinishedPage;
-  ThanksCheckBox.Caption := 'enes''e teşekkür et';
-  ThanksCheckBox.Checked := False;
-  ThanksCheckBox.Visible := False;
-  ThanksCheckBox.TabOrder := WizardForm.RunList.TabOrder + 1;
-  { Deliberately no OnClick handler, no persistence and no action. Just a joke. }
+  OpenCheckBox := CreateFinishCheckBox('enestv''yi şimdi aç');
+  ThanksCheckBox := CreateFinishCheckBox('enes''e teşekkür et');
+end;
+
+{ "enes'e teşekkür et": leave a local marker; enestv shows a short thank-you note on its next start and deletes it.
+  Nothing is sent anywhere. Written before enestv is started, so the note appears on this first launch.
+  Not reached in silent installs (no wizard), which therefore neither open the app nor leave the marker. }
+function NextButtonClick(CurPageID: Integer): Boolean;
+var
+  DataDir: String;
+  ErrorCode: Integer;
+begin
+  Result := True;
+  if CurPageID <> wpFinished then Exit;
+  if ThanksCheckBox.Checked then
+  begin
+    DataDir := ExpandConstant('{localappdata}\enestv');
+    if ForceDirectories(DataDir) then
+      SaveStringToFile(DataDir + '\thanks.flag', 'thanks', False);
+  end;
+  if OpenCheckBox.Checked then
+    ShellExec('', ExpandConstant('{app}\enestv.exe'), '', ExpandConstant('{app}'), SW_SHOWNORMAL, ewNoWait, ErrorCode);
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
+  OpenCheckBox.Visible := CurPageID = wpFinished;
   ThanksCheckBox.Visible := CurPageID = wpFinished;
   if CurPageID = wpFinished then
   begin
-    WizardForm.RunList.Height := ScaleY(32);
+    OpenCheckBox.SetBounds(
+      WizardForm.FinishedLabel.Left,
+      WizardForm.FinishedLabel.Top + WizardForm.FinishedLabel.Height + ScaleY(20),
+      WizardForm.FinishedLabel.Width,
+      ScaleY(20));
     ThanksCheckBox.SetBounds(
       WizardForm.FinishedLabel.Left,
-      WizardForm.RunList.Top + WizardForm.RunList.Height + ScaleY(12),
+      OpenCheckBox.Top + OpenCheckBox.Height + ScaleY(8),
       WizardForm.FinishedLabel.Width,
-      ScaleY(25));
+      ScaleY(20));
   end;
 end;

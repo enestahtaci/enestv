@@ -23,11 +23,25 @@ public partial class MainWindow : Window
         AudioTracks.ItemsSource = new[] { new TrackOption(-2, "Ses izi yok") }; AudioTracks.SelectedIndex = 0;
         SubtitleTracks.ItemsSource = new[] { new TrackOption(-2, "Altyazı yok") }; SubtitleTracks.SelectedIndex = 0;
         _updatingTracks = false;
-        Loaded += async (_, _) => { try { await _vm.InitializeAsync(); App.Log.Write("app.ready"); } catch (Exception ex) { _vm.Error(ex); } };
+        Loaded += async (_, _) => { try { await _vm.InitializeAsync(); App.Log.Write("app.ready"); } catch (Exception ex) { _vm.Error(ex); } ShowThanksIfRequested(); };
         Closing += OnClosing;
         _vm.Playback.TracksChanged += () => { if (!_vm.IsVod) QueueRefreshTracks(); };
         _vm.ActiveTracksChanged += QueueRefreshTracks;
     }
+    // Setup writes thanks.flag when "enes'e teşekkür et" is ticked; show the note once, then forget it. Local only.
+    private void ShowThanksIfRequested()
+    {
+        var flag = System.IO.Path.Combine(App.DataRoot, "thanks.flag");
+        try { if (!System.IO.File.Exists(flag)) return; System.IO.File.Delete(flag); }
+        catch (Exception ex) { App.Log.Write("thanks.flag.failed", ex); return; }
+        if (!_fullscreen) ThanksNote.Visibility = Visibility.Visible;
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
+        timer.Tick += (_, _) => { timer.Stop(); HideThanks(); };
+        timer.Start();
+    }
+    private void ThanksClose_Click(object sender, RoutedEventArgs e) => HideThanks();
+    // Also drop it from the fullscreen restore list, so leaving fullscreen does not bring it back.
+    private void HideThanks() { ThanksNote.Visibility = Visibility.Collapsed; _normalVisibility.Remove(ThanksNote); }
     private void QueueRefreshTracks() { if (!Dispatcher.HasShutdownStarted) Dispatcher.BeginInvoke(() => RefreshTracks()); }
     // Errors belong to the visible mode's status line.
     private void ReportError(Exception ex) { if (_vm.IsVod && _vm.Vod is { } vod) vod.Error(ex); else _vm.Error(ex); }

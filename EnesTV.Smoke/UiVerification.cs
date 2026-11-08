@@ -19,6 +19,9 @@ public static class UiVerification
         var thread = new Thread(() =>
         {
             Environment.SetEnvironmentVariable("ENESTV_DATA_DIR", Path.Combine(root, "ui-library"));
+            // What Setup leaves behind when "enes'e teşekkür et" is ticked.
+            var thanksFlag = Path.Combine(root, "ui-library", "thanks.flag");
+            Directory.CreateDirectory(Path.GetDirectoryName(thanksFlag)!); File.WriteAllText(thanksFlag, "thanks");
             var app = new EnesTV.App.App(); app.InitializeComponent();
             var start = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
             start.Tick += async (_, _) =>
@@ -28,6 +31,11 @@ public static class UiVerification
                 {
                     await Task.Delay(500);
                     var main = app.MainWindow;
+                    var thanks = (Border)main.FindName("ThanksNote");
+                    if (!thanks.IsVisible || File.Exists(thanksFlag)) throw new InvalidOperationException("Setup thank-you note shows once and clears its flag");
+                    Capture(main, Path.Combine(root, "enestv-thanks.png"));
+                    ((DockPanel)thanks.Child).Children.OfType<Button>().Single().RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    if (thanks.IsVisible) throw new InvalidOperationException("Thank-you note closes");
                     WindowChecks.Caption(main, false);
                     if (!vm.NeedsSource || vm.Channels.Count != 0 || !((FrameworkElement)main.FindName("EmptyState")).IsVisible) throw new InvalidOperationException("First launch offers source onboarding");
                     Capture(main, Path.Combine(root, "enestv-empty.png"));

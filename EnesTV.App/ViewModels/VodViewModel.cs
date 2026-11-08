@@ -47,7 +47,7 @@ public sealed class VodViewModel : Observable, IAsyncDisposable
     public VodKind Kind { get => _kind; set { if (Set(ref _kind, value)) { Raise(nameof(IsSeries)); Raise(nameof(IsMovie)); Observe(LoadCatalogAsync(false)); } } }
     public bool IsSeries => Kind == VodKind.Series;
     public bool IsMovie => Kind == VodKind.Movie;
-    public bool Busy { get => _busy; private set { Set(ref _busy, value); UpdateEmptyState(); } }
+    public bool Busy { get => _busy; private set { Set(ref _busy, value); UpdateEmptyState(); Raise(nameof(CountText)); } }
     public bool DetailBusy { get => _detailBusy; private set { Set(ref _detailBusy, value); Raise(nameof(CanPlay)); } }
     public string Status { get => _status; private set => Set(ref _status, value); }
     public string PlaybackText { get => _playbackText; private set => Set(ref _playbackText, value); }
@@ -63,7 +63,7 @@ public sealed class VodViewModel : Observable, IAsyncDisposable
     public string PauseIcon => _playbackState is PlaybackState.Playing or PlaybackState.Buffering ? "Pause" : "Play";
     public bool ShowPlayerHint => _playbackState == PlaybackState.Idle;
     public bool PlaybackError => _playbackState == PlaybackState.Error;
-    public string CountText => $"{Items.Count:N0} {(IsSeries ? "dizi" : "film")}";
+    public string CountText => Busy && Items.Count == 0 ? "Katalog yükleniyor…" : $"{Items.Count:N0} {(IsSeries ? "dizi" : "film")}";
     public VodItem? Selected { get => _selected; set { if (Set(ref _selected, value)) Observe(LoadDetailsAsync()); } }
     public VodItem? Detail { get => _detail; private set { Set(ref _detail, value); Raise(nameof(CanPlay)); Raise(nameof(ResumeLabel)); } }
     public IReadOnlyList<int> Seasons { get => _seasons; private set => Set(ref _seasons, value); }

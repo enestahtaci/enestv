@@ -28,6 +28,7 @@ Third-party components' own license and copyright notices are preserved; the sou
 | Microsoft.NETCore.App; Microsoft.WindowsDesktop.App | 8.0.31 in the payload | MIT and applicable third-party terms | licenses/dotnet-LICENSE.txt and dotnet-THIRD-PARTY-NOTICES.txt |
 | vcruntime140_cor3.dll | Distributed .NET 8.0.31 runtime component | Applicable Microsoft runtime distribution terms | Microsoft; relevant license/copyright notices from the .NET package are preserved |
 | Segoe UI | Windows system font | Windows font terms | Microsoft; the font file is not distributed and is only referenced by name |
+| Lucide icons (25 icon paths, converted to WPF geometry in EnesTV.App/Views/Icon.cs) | lucide-static 0.460.0 | ISC | Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide Contributors 2022. licenses/Lucide-ISC.txt; https://lucide.dev |
 
 The relevant sources, modifications and static dependencies of native libraries included in the distribution are covered by the source offer below.
 DLLs are distributed as separate files. The rights to use LGPL libraries with interface-compatible modified versions, obtain the relevant sources and debug these modifications must be preserved.
