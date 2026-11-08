@@ -2,7 +2,7 @@
 
 enestv: GPL-3.0-or-later. Copyright (c) 2026 enestv katkıcıları.
 This license does not change the licenses of third-party components.
-This inventory describes the current 1.3.0 payload. Plugins are retained in this version; the removal proposal has been deferred to v1.4.
+This inventory describes the current 1.4.0 payload. Plugins are retained in this version; the plugin removal proposal remains deferred to a later release.
 Third-party components' own license and copyright notices are preserved; the source offer below accompanies this distribution.
 
 ## Runtime
@@ -25,8 +25,8 @@ Third-party components' own license and copyright notices are preserved; the sou
 | e_sqlite3.dll / SQLite | Version string 3.53.3 in the binary | Public domain | https://www.sqlite.org/copyright.html  |
 | System.Security.Cryptography.ProtectedData; System.Text.Encoding.CodePages | 8.0.0 | MIT | Copyright Microsoft Corporation. All rights reserved |
 | System.Memory | 4.5.3 | MIT and package third-party notices | Copyright (c) .NET Foundation and Contributors. All rights reserved |
-| Microsoft.NETCore.App; Microsoft.WindowsDesktop.App | 8.0.31 in the payload | MIT and applicable third-party terms | licenses/dotnet-LICENSE.txt and dotnet-THIRD-PARTY-NOTICES.txt |
-| vcruntime140_cor3.dll | Distributed .NET 8.0.31 runtime component | Applicable Microsoft runtime distribution terms | Microsoft; relevant license/copyright notices from the .NET package are preserved |
+| Microsoft.NETCore.App; Microsoft.WindowsDesktop.App | 8.0.33 in the payload | MIT and applicable third-party terms | licenses/dotnet-LICENSE.txt and dotnet-THIRD-PARTY-NOTICES.txt |
+| vcruntime140_cor3.dll | Distributed .NET 8.0.33 runtime component | Applicable Microsoft runtime distribution terms | Microsoft; relevant license/copyright notices from the .NET package are preserved |
 | Segoe UI | Windows system font | Windows font terms | Microsoft; the font file is not distributed and is only referenced by name |
 | Lucide icons (25 icon paths, converted to WPF geometry in EnesTV.App/Views/Icon.cs) | lucide-static 0.460.0 | ISC | Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide Contributors 2022. licenses/Lucide-ISC.txt; https://lucide.dev |
 
