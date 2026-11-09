@@ -1,7 +1,6 @@
 MIT notices for runtime components distributed by enestv
 
-Microsoft.Data.Sqlite / Microsoft.Data.Sqlite.Core 8.0.30;
-System.Security.Cryptography.ProtectedData / System.Text.Encoding.CodePages 8.0.0:
+Microsoft.Data.Sqlite / Microsoft.Data.Sqlite.Core 10.0.14:
 Copyright (c) Microsoft Corporation. All rights reserved.
 
 jsTree 1.0-rc3:

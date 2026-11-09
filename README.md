@@ -20,8 +20,8 @@ The [enestv source repository](https://github.com/enestahtaci/enestv) and the co
 
 ## Building the application and installer
 
-This version targets .NET 8; migration to .NET 10 is a separate task. .NET 8 support ends on November 10, 2026; maintenance should be planned accordingly.
-On Windows 11 x64 with the .NET 8 SDK, run from the repository root:
+This version targets .NET 10 (LTS, supported until November 2028).
+On Windows 11 x64 with the .NET 10 SDK, run from the repository root:
 
 ```powershell
 dotnet restore enestv.sln
@@ -31,6 +31,13 @@ dotnet test EnesTV.Tests -c Release
 
 Inno Setup is required to build the installer. Pass the installed ISCC.exe path to `Installer/Build-Setup.ps1` using `-InnoCompiler`. The script publishes a self-contained x64 application and builds the installer using a fresh staging directory.
 These commands are documentation; they were not run during Stage 2 preparation. [Release checklist](RELEASE-CHECKLIST.md).
+
+### 1.4.1 — .NET 10
+
+Update using `enestv-Setup-1.4.1-x64.exe`. Close any running instance of enestv first. Accounts, favorites, history and playback positions are preserved; the database schema does not change.
+
+- The app now runs on .NET 10 (LTS, supported until November 2028) instead of .NET 8, whose support ended on November 10, 2026. The runtime is included in the package; no separate installation is needed.
+- SQLite components were updated (Microsoft.Data.Sqlite 10.0.14, SQLitePCLRaw 2.1.13). There are no feature changes.
 
 ### 1.4.0 — single window, fullscreen fixes
 
@@ -100,7 +107,7 @@ The final page has an optional “enestv'yi şimdi aç” (Launch enestv now) op
 
 The new icon was added to Windows EXE resources, application windows, Setup/uninstaller and shortcuts. PNG/ICO assets are in `EnesTV.App/Assets`. Setup is not code-signed.
 
-Rebuilding the installer requires the .NET 8 SDK and Inno Setup 6.7.3 or later:
+Rebuilding the installer requires the .NET 10 SDK and Inno Setup 6.7.3 or later:
 
 ```powershell
 ./Installer/Build-Setup.ps1 -InnoCompiler 'C:\Path\To\Inno Setup 6\ISCC.exe'
@@ -112,7 +119,7 @@ The script publishes the self-contained x64 application, copies license files an
 
 The Windows title bar, text and border now match the selected dark/light theme. The fullscreen button or F11 displays only the video across the entire monitor, including the taskbar area; channel information, EPG, controls and margins are hidden. Esc or F11 restores the previous normal/maximized window layout. The video aspect ratio setting is preserved.
 
-A C# / .NET 8 / WPF IPTV desktop application for Windows 11 x64. It plays the user's own legal sources. No provider, preloaded channel list or streaming account is supplied with the application.
+A C# / .NET 10 / WPF IPTV desktop application for Windows 11 x64. It plays the user's own legal sources. No provider, preloaded channel list or streaming account is supplied with the application.
 
 ## Quick start
 
@@ -129,7 +136,7 @@ Open **enestv.exe** in the prepared `enestv-win-x64` folder. The distribution in
 ## Development requirements
 
 - Windows 11 x64
-- .NET 8 SDK (8.0.425 was used during development)
+- .NET 10 SDK (10.0.403 was used during development)
 - NuGet access for the initial package restore
 - Optional: Visual Studio 2022 with the .NET desktop development workload
 

@@ -2,7 +2,7 @@
 
 enestv: GPL-3.0-or-later. Copyright (c) 2026 enestv katkıcıları.
 This license does not change the licenses of third-party components.
-This inventory describes the current 1.4.0 payload. Plugins are retained in this version; the plugin removal proposal remains deferred to a later release.
+This inventory describes the current 1.4.1 payload. Plugins are retained in this version; the plugin removal proposal remains deferred to a later release.
 Third-party components' own license and copyright notices are preserved; the source offer below accompanies this distribution.
 
 ## Runtime
@@ -20,13 +20,11 @@ Third-party components' own license and copyright notices are preserved; the sou
 | VLC HTTP HTML and supporting resources | VLC 3.0.23 | HTML: GPL-2.0-or-later; other files under their own licenses | Example: Copyright (C) 2005-2014 VLC authors and VideoLAN; differing headers in individual files are also preserved |
 | jsTree | 1.0-rc3 | MIT OR GPL-2.0; distributed under the MIT option | Copyright (c) 2010 Ivan Bozhanov (vakata.com) |
 | jQuery UI CSS and theme resources | 1.8.13 | MIT OR GPL-2.0; distributed under the MIT option | Copyright 2011, AUTHORS.txt (http://jqueryui.com/about) |
-| Microsoft.Data.Sqlite and Microsoft.Data.Sqlite.Core | 8.0.30 | MIT | Copyright Microsoft Corporation. All rights reserved. https://github.com/dotnet/efcore |
-| SQLitePCLRaw.bundle_e_sqlite3, core, lib.e_sqlite3, provider.e_sqlite3 | 2.1.12 | Apache-2.0 | Copyright 2014-2024 SourceGear, LLC. https://github.com/ericsink/SQLitePCL.raw |
+| Microsoft.Data.Sqlite and Microsoft.Data.Sqlite.Core | 10.0.14 | MIT | Copyright Microsoft Corporation. All rights reserved. https://github.com/dotnet/efcore |
+| SQLitePCLRaw.bundle_e_sqlite3, core, lib.e_sqlite3, provider.e_sqlite3 | 2.1.13 | Apache-2.0 | Copyright 2014-2024 SourceGear, LLC. https://github.com/ericsink/SQLitePCL.raw |
 | e_sqlite3.dll / SQLite | Version string 3.53.3 in the binary | Public domain | https://www.sqlite.org/copyright.html  |
-| System.Security.Cryptography.ProtectedData; System.Text.Encoding.CodePages | 8.0.0 | MIT | Copyright Microsoft Corporation. All rights reserved |
-| System.Memory | 4.5.3 | MIT and package third-party notices | Copyright (c) .NET Foundation and Contributors. All rights reserved |
-| Microsoft.NETCore.App; Microsoft.WindowsDesktop.App | 8.0.33 in the payload | MIT and applicable third-party terms | licenses/dotnet-LICENSE.txt and dotnet-THIRD-PARTY-NOTICES.txt |
-| vcruntime140_cor3.dll | Distributed .NET 8.0.33 runtime component | Applicable Microsoft runtime distribution terms | Microsoft; relevant license/copyright notices from the .NET package are preserved |
+| Microsoft.NETCore.App; Microsoft.WindowsDesktop.App (includes System.Security.Cryptography.ProtectedData, System.Text.Encoding.CodePages and System.Memory) | 10.0.14 in the payload | MIT and applicable third-party terms | licenses/dotnet-LICENSE.txt and dotnet-THIRD-PARTY-NOTICES.txt |
+| vcruntime140_cor3.dll | Distributed .NET 10.0.14 runtime component | Applicable Microsoft runtime distribution terms | Microsoft; relevant license/copyright notices from the .NET package are preserved |
 | Segoe UI | Windows system font | Windows font terms | Microsoft; the font file is not distributed and is only referenced by name |
 | Lucide icons (25 icon paths, converted to WPF geometry in EnesTV.App/Views/Icon.cs) | lucide-static 0.460.0 | ISC | Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide Contributors 2022. licenses/Lucide-ISC.txt; https://lucide.dev |
 

@@ -20,8 +20,8 @@ enestv yayın, playlist, film/dizi, EPG veya hesap sağlamaz. Kullanıcı erişi
 
 ## Derleme ve kurulum paketi üretimi
 
-Bu sürüm .NET 8 hedefler; .NET 10 geçişi ayrı iştir. .NET 8 desteği 10 Kasım 2026'da biter; bakım buna göre planlanmalıdır.
-Windows 11 x64 ve .NET 8 SDK ile depo kökünde:
+Bu sürüm .NET 10 hedefler (LTS, Kasım 2028'e kadar destekli).
+Windows 11 x64 ve .NET 10 SDK ile depo kökünde:
 
 ```powershell
 dotnet restore enestv.sln
@@ -31,6 +31,13 @@ dotnet test EnesTV.Tests -c Release
 
 Kurulum için Inno Setup gerekir. `Installer/Build-Setup.ps1` betiğine `-InnoCompiler` ile kurulu ISCC.exe yolunu verin. Betik bağımsız x64 publish ve installer üretimini yürütür; taze staging dizini kullanır.
 Bu komutlar dokümantasyondur; Aşama 2 hazırlığında çalıştırılmadı. [Release kontrol listesi](RELEASE-CHECKLIST.md).
+
+### 1.4.1 — .NET 10
+
+`enestv-Setup-1.4.1-x64.exe` ile güncelleyin. Önce açık enestv'yi kapatın. Hesaplar, favoriler, geçmiş ve izleme konumları korunur; veritabanı şeması değişmez.
+
+- Uygulama .NET 8 yerine .NET 10 (LTS, Kasım 2028'e kadar destekli) ile çalışır; .NET 8'in desteği 10 Kasım 2026'da sona erdi. Çalışma zamanı pakete dahildir, ayrıca kurulum gerekmez.
+- SQLite bileşenleri güncellendi (Microsoft.Data.Sqlite 10.0.14, SQLitePCLRaw 2.1.13). Özellik değişikliği yoktur.
 
 ### 1.4.0 — tek pencere, tam ekran düzeltmeleri
 
@@ -100,7 +107,7 @@ Son sayfada isteğe bağlı “enestv'yi şimdi aç” seçeneği ve yalnızca �
 
 Yeni ikon Windows EXE kaynaklarına, uygulama pencerelerine, Setup/kaldırıcıya ve kısayollara eklendi. PNG/ICO kaynakları `EnesTV.App/Assets` içindedir. Setup kod imzası içermez.
 
-Kurulumu yeniden derlemek için .NET 8 SDK ve Inno Setup 6.7.3 veya üzeri gerekir:
+Kurulumu yeniden derlemek için .NET 10 SDK ve Inno Setup 6.7.3 veya üzeri gerekir:
 
 ```powershell
 ./Installer/Build-Setup.ps1 -InnoCompiler 'C:\Path\To\Inno Setup 6\ISCC.exe'
@@ -112,7 +119,7 @@ Script bağımsız x64 uygulamayı publish eder, lisans dosyalarını kopyalar v
 
 Windows başlık çubuğu, yazısı ve çerçevesi artık seçili koyu/açık temayla eşleşir. Tam ekran düğmesi veya F11 yalnızca videoyu, görev çubuğu alanı dahil tüm monitörde gösterir; kanal bilgisi, EPG, kontroller ve kenar boşlukları gizlenir. Esc veya F11 önceki normal/büyütülmüş pencere düzenini geri getirir. Video en-boy oranı ayarı korunur.
 
-Windows 11 x64 için C# / .NET 8 / WPF IPTV masaüstü uygulaması. Kullanıcının kendi yasal kaynaklarını oynatır. Uygulama ile birlikte sağlayıcı, hazır kanal listesi veya yayın hesabı verilmez.
+Windows 11 x64 için C# / .NET 10 / WPF IPTV masaüstü uygulaması. Kullanıcının kendi yasal kaynaklarını oynatır. Uygulama ile birlikte sağlayıcı, hazır kanal listesi veya yayın hesabı verilmez.
 
 ## Hızlı başlangıç
 
@@ -129,7 +136,7 @@ Hazır `enestv-win-x64` klasöründeki **enestv.exe** dosyasını açın. Dağı
 ## Geliştirme gereksinimleri
 
 - Windows 11 x64
-- .NET 8 SDK (geliştirme sırasında 8.0.425 kullanıldı)
+- .NET 10 SDK (geliştirme sırasında 10.0.403 kullanıldı)
 - İlk paket geri yüklemesinde NuGet erişimi
 - İsteğe bağlı Visual Studio 2022, .NET masaüstü geliştirme iş yükü
 

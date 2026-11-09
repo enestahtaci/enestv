@@ -2,7 +2,7 @@
 
 ## Proje
 Windows 11 x64 için açık kaynak IPTV oynatıcı. Lisans: **GPL-3.0-or-later**. Repo: https://github.com/enestahtaci/enestv
-C# / .NET 8 / WPF / MVVM · LibVLCSharp(.WPF) 3.10.1 + VideoLAN.LibVLC.Windows 3.0.23.1 · SQLite · DPAPI · Inno Setup 6.
+C# / .NET 10 / WPF / MVVM · LibVLCSharp(.WPF) 3.10.1 + VideoLAN.LibVLC.Windows 3.0.23.1 · SQLite · DPAPI · Inno Setup 6.
 Uygulama yayın, liste veya hesap içermez; kullanıcı kendi M3U/Xtream kaynağını ekler. Veriler `%LOCALAPPDATA%\enestv` (veya `ENESTV_DATA_DIR`).
 
 ## Yapı
@@ -20,7 +20,7 @@ Uygulama yayın, liste veya hesap içermez; kullanıcı kendi M3U/Xtream kaynağ
 - `EnesTV.Tests/` birim testleri · `EnesTV.Smoke/` gerçek VLC ve WPF ile entegrasyon/UI doğrulaması · `Installer/` Inno Setup.
 
 ## Komutlar
-.NET 8 SDK `C:\Program Files\dotnet\dotnet.exe`, Inno Setup `%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`.
+.NET 10 SDK `C:\Program Files\dotnet\dotnet.exe`, Inno Setup `%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`.
 ```powershell
 dotnet build enestv.sln -c Debug
 dotnet test EnesTV.Tests -c Debug --no-build
@@ -76,6 +76,6 @@ powershell -ExecutionPolicy Bypass -File Installer\Build-Setup.ps1 -InnoCompiler
 - `TreatWarningsAsErrors=true` — uyarısız derleme zorunlu.
 
 ## Bilinen açık işler
-- **.NET 8 desteği 10 Kasım 2026'da biter**; .NET 10 (LTS) geçişi ayrı iş olarak planlanmalı.
-- GitHub Release yayınlanmadı: `RELEASE-CHECKLIST.md` (kaynak arşivleri, `SHA256SUMS.txt`) tamamlanmalı.
+- Çok platform planı Faz 0: çekirdeği platformdan bağımsız yapmak (`ISecretProtector`), ortak test verileri, yedekle/geri yükle.
+- Her Release'te `RELEASE-CHECKLIST.md` izlenir; v1.4.0 düzeni (kaynak arşivleri, `SHA256SUMS.txt`) örnektir.
 - VLC eklenti ayıklama önerisi ertelendi.

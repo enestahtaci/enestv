@@ -1,4 +1,4 @@
-SQLitePCLRaw 2.1.12
+SQLitePCLRaw 2.1.13
 Components: bundle_e_sqlite3, core, lib.e_sqlite3, provider.e_sqlite3.
 Copyright 2014-2024 SourceGear, LLC
 Licensed under Apache-2.0; see Apache-2.0.txt.
