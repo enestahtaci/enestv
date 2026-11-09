@@ -32,6 +32,14 @@ dotnet test EnesTV.Tests -c Release
 Kurulum için Inno Setup gerekir. `Installer/Build-Setup.ps1` betiğine `-InnoCompiler` ile kurulu ISCC.exe yolunu verin. Betik bağımsız x64 publish ve installer üretimini yürütür; taze staging dizini kullanır.
 Bu komutlar dokümantasyondur; Aşama 2 hazırlığında çalıştırılmadı. [Release kontrol listesi](RELEASE-CHECKLIST.md).
 
+### 1.5.0 — yedekleme ve Türkçe arama
+
+`enestv-Setup-1.5.0-x64.exe` ile güncelleyin. Önce açık enestv'yi kapatın. Hesaplar, favoriler, geçmiş ve izleme konumları korunur; veritabanı şeması değişmez.
+
+- **Ayarlar > Yedekleme** ile kaynaklar, hesaplar, favoriler, son izlenenler, kanal düzeni, kısayollar, ayarlar ve film/dizi izleme konumları tek bir `.enestv` dosyasına yedeklenir. Dosya her zaman sizin belirlediğiniz parolayla şifrelenir (en az 8 karakter); parolayı unutursanız yedek açılamaz.
+- **Geri yükle** önce yedeğin özetini gösterir ve onay ister; kütüphanenin tamamı yedektekiyle değiştirilir. Değiştirmeden önce mevcut kütüphanenin bir kopyası `%LOCALAPPDATA%\enestv\backups` klasörüne kaydedilir.
+- Aramada Türkçe harfler doğru eşleşir: "istanbul", "İSTANBUL" ve "ISPARTA", "ısparta" birbirini bulur (I/ı/İ/i tek harf sayılır).
+
 ### 1.4.1 — .NET 10
 
 `enestv-Setup-1.4.1-x64.exe` ile güncelleyin. Önce açık enestv'yi kapatın. Hesaplar, favoriler, geçmiş ve izleme konumları korunur; veritabanı şeması değişmez.

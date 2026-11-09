@@ -2,7 +2,7 @@
 
 enestv: GPL-3.0-or-later. Copyright (c) 2026 enestv katkıcıları.
 This license does not change the licenses of third-party components.
-This inventory describes the current 1.4.1 payload. Plugins are retained in this version; the plugin removal proposal remains deferred to a later release.
+This inventory describes the current 1.5.0 payload. Plugins are retained in this version; the plugin removal proposal remains deferred to a later release.
 Third-party components' own license and copyright notices are preserved; the source offer below accompanies this distribution.
 
 ## Runtime

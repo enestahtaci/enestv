@@ -32,6 +32,14 @@ dotnet test EnesTV.Tests -c Release
 Inno Setup is required to build the installer. Pass the installed ISCC.exe path to `Installer/Build-Setup.ps1` using `-InnoCompiler`. The script publishes a self-contained x64 application and builds the installer using a fresh staging directory.
 These commands are documentation; they were not run during Stage 2 preparation. [Release checklist](RELEASE-CHECKLIST.md).
 
+### 1.5.0 — backup and Turkish-aware search
+
+Update using `enestv-Setup-1.5.0-x64.exe`. Close any running instance of enestv first. Accounts, favorites, history and playback positions are preserved; the database schema does not change.
+
+- **Settings > Backup** saves sources, accounts, favorites, recently watched, channel layout, shortcuts, settings and movie/series playback positions to a single `.enestv` file. The file is always encrypted with a passphrase you choose (at least 8 characters); a backup cannot be opened without it.
+- **Restore** shows a summary of the backup and asks for confirmation; the whole library is replaced with the backup's contents. A copy of the current library is saved to `%LOCALAPPDATA%\enestv\backups` first.
+- Search matches Turkish letters correctly: "istanbul" finds "İSTANBUL" and "ısparta" finds "ISPARTA" (I/ı/İ/i count as one letter).
+
 ### 1.4.1 — .NET 10
 
 Update using `enestv-Setup-1.4.1-x64.exe`. Close any running instance of enestv first. Accounts, favorites, history and playback positions are preserved; the database schema does not change.
