@@ -72,7 +72,8 @@ public sealed partial class LibraryStore(string path, ISecretProtector protector
         }
         return true;
     }, ct);
-    public Task<Library> LoadAsync(CancellationToken ct = default) => Run(db =>
+    public Task<Library> LoadAsync(CancellationToken ct = default) => Run(db => Load(db, ct), ct);
+    private Library Load(SqliteConnection db, CancellationToken ct)
     {
         var sources = new List<Source>(); var channels = new List<Channel>(); var fav = new HashSet<string>(); var recent = new List<string>();
         using var cmd = db.CreateCommand(); cmd.CommandText = "SELECT id,name,kind,secret,updated FROM sources";
@@ -87,7 +88,7 @@ public sealed partial class LibraryStore(string path, ISecretProtector protector
         var value = cmd.ExecuteScalar();
         var settings = value is byte[] bytes ? JsonSerializer.Deserialize<UserSettings>(_protector.Unprotect(bytes))! : new UserSettings();
         return new Library(sources, channels, fav, recent, settings);
-    }, ct);
+    }
     public Task SaveSourceAsync(Source source, IReadOnlyList<Channel> channels, CancellationToken ct = default) => Run(db =>
     {
         using var tx = db.BeginTransaction();

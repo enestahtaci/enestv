@@ -142,7 +142,40 @@ Başlık yoksa `İsimsiz program`, açıklama yoksa boş. Eşleştirme kanalın 
   kataloğu ve izleme konumları da silinir.
 - Varsayılan ayarlar: tema `Dark`, ses 75, otomatik yeniden bağlanma açık, EPG adresi boş.
 - Şifreleme anahtarları cihaza bağlıdır (Windows: DPAPI). Veri bir cihazdan diğerine veritabanı kopyalanarak
-  taşınamaz; bunun için yedekle/geri yükle biçimi kullanılır (Faz 0.4).
+  taşınamaz; bunun için yedek dosyası kullanılır (6a).
+
+## 6a. Yedek (`.enestv`, fixture: `backup/sample.enestv`, parola `enestv-fixture-parola`)
+
+Yedek, cihazlar ve platformlar arasında taşınabilen tek dosyadır ve **her zaman parolayla şifrelenir**: kaynak
+bilgileri, M3U/EPG adresleri ve Xtream kanal adresleri (`/live/{u}/{p}/…`) hesap bilgisi taşır.
+
+**Zarf** (düz JSON, UTF-8):
+
+```json
+{ "format": "enestv-backup", "version": 1, "created": "…",
+  "kdf":    { "name": "PBKDF2-HMAC-SHA256", "iterations": 600000, "salt": "<base64, 16 bayt>" },
+  "cipher": { "name": "AES-256-GCM", "nonce": "<base64, 12 bayt>", "tagLength": 16 },
+  "data":   "<base64(şifreli metin || 16 baytlık etiket)>" }
+```
+
+- Anahtar: PBKDF2-HMAC-SHA256(UTF-8(**NFC** parola), salt, iterations) → 32 bayt. Uygulama 600.000 tur kullanır;
+  okurken 10.000–10.000.000 arası kabul edilir.
+- Şifreleme: AES-256-GCM, ek doğrulanmış veri (AAD) = UTF-8(`enestv-backup/v1`).
+- Parola en az 8 karakter (NFC sonrası). Dosya en fazla 64 MB.
+- Hatalar (kullanıcı hatası): biçim/JSON uymazsa "Bu dosya bir enestv yedeği değil"; `version` desteklenenden büyükse
+  "daha yeni bir enestv sürümüyle oluşturulmuş"; etiket doğrulanmazsa "Parola yanlış ya da yedek dosyası bozulmuş".
+
+**İçerik** (şifreli JSON, alan adları camelCase, sayım türleri metin):
+`version`, `created`, `appVersion`, `sources[]` (`id`, `name`, `kind`, `location`, `username`, `password`, `updated`),
+`channels[]` (kanal alanları, bkz. 1), `favorites[]` (kanal anahtarları), `recent[]` (en yeni önce, ≤ 20),
+`settings` (`theme`, `defaultVolume`, `autoReconnect`, `epgUrl`), `layout` (`channels`: anahtar → `name`/`order`/`hidden`;
+`hiddenCategories`; `favoriteLists[]`: `id`/`name`/`channels`; `shortcuts`), `progress[]` (`sourceId`, `key`,
+`positionMs`, `durationMs`, `completed`, `updated`). Film/dizi kataloğu önbelleği ve TV rehberi yedeğe girmez.
+
+**Geri yükleme** tamamen değiştirir: önce mevcut kütüphanenin yerel güvenlik kopyası alınır (Windows:
+`%LOCALAPPDATA%\enestv\backups\library-before-restore-*.db`), sonra tek işlemde kaynaklar ve bağlı her şey silinip
+yedektekiler yazılır. Favori ve son izlenenler yalnızca yedekteki kanallar için, izleme konumları yalnızca yedekteki
+kaynaklar için yazılır. TV rehberi korunur.
 
 ## 7. İzleme konumu
 

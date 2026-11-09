@@ -78,8 +78,11 @@ powershell -ExecutionPolicy Bypass -File Installer\Build-Setup.ps1 -InnoCompiler
 - `TreatWarningsAsErrors=true` — uyarısız derleme zorunlu.
 
 ## Bilinen açık işler
-- Çok platform planı Faz 0: .NET 10 (0.1), platformdan bağımsız çekirdek (0.2), ortak test verileri ve davranış
-  belgesi (0.3) tamam; kalan: yedekle/geri yükle (0.4). Birim testleri `net10.0`'da `TestSecretProtector` ile çalışır.
+- Çok platform planı Faz 0 tamam: .NET 10 (0.1), platformdan bağımsız çekirdek (0.2), ortak test verileri ve davranış
+  belgesi (0.3), parolalı yedek (0.4, `BackupFile` + `LibraryStore.ExportAsync/ReplaceAllAsync`). Sıradaki: Android TV
+  deneme sürümü ve teknoloji kararı. Birim testleri `net10.0`'da `TestSecretProtector` ile çalışır.
+- Yedek biçimi (`docs/CORE-SPEC.md` §6a) diğer platformlarla ortaktır: alanı veya şifreleme parametresini değiştirme;
+  gerekirse `version` artırılır ve eski sürüm okunmaya devam eder.
 
 ## Çekirdek kuralları
 - Ayrıştırma/kimlik/EPG kuralları `docs/CORE-SPEC.md`'de; ölçülebilir hâli `fixtures/` (dilden bağımsız, `FixtureTests`).

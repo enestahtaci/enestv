@@ -14,6 +14,36 @@ public partial class SettingsWindow : Window
     private UserSettings ReadSettings() => new(ThemeChoice.SelectedIndex == 1 ? "Light" : "Dark", (int)DefaultVolume.Value, AutoReconnect.IsChecked == true, EpgUrl.Text.Trim());
     private async void Save_Click(object sender, RoutedEventArgs e) { try { await _vm.SaveSettingsAsync(ReadSettings()); } catch (Exception ex) { _vm.Error(ex); } }
     private async void Epg_Click(object sender, RoutedEventArgs e) { try { await _vm.SaveSettingsAsync(ReadSettings()); await _vm.RefreshEpgAsync(); } catch (Exception ex) { _vm.Error(ex); } }
+    private async void Backup_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new Microsoft.Win32.SaveFileDialog { FileName = $"enestv-yedek-{DateTime.Now:yyyy-MM-dd}.enestv", Filter = "enestv yedeği (*.enestv)|*.enestv", DefaultExt = ".enestv" };
+        if (picker.ShowDialog(this) != true) return;
+        var dialog = new PassphraseDialog("Yedek parolası", "Yedeği açmak için bu parola gerekecek. En az 8 karakter; unutursan yedek açılamaz.", confirm: true) { Owner = this };
+        if (dialog.ShowDialog() != true) return;
+        await RunBusy(() => _vm.ExportBackupAsync(picker.FileName, dialog.Passphrase));
+    }
+    private async void Restore_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new Microsoft.Win32.OpenFileDialog { Filter = "enestv yedeği (*.enestv)|*.enestv|Tüm dosyalar|*.*" };
+        if (picker.ShowDialog(this) != true) return;
+        var dialog = new PassphraseDialog("Yedeği aç", "Yedeği oluştururken belirlediğin parolayı gir.", confirm: false) { Owner = this };
+        if (dialog.ShowDialog() != true) return;
+        LibraryBackup? backup = null;
+        await RunBusy(async () => backup = await _vm.ReadBackupAsync(picker.FileName, dialog.Passphrase));
+        if (backup == null) return;
+        var question = $"Yedek tarihi: {backup.Created.LocalDateTime:g}\n{backup.Sources.Count} kaynak, {backup.Channels.Count:N0} kanal, {backup.Favorites.Count} favori.\n\n" +
+                       "Mevcut kütüphanen bu yedekle tamamen değiştirilecek. Önce otomatik bir güvenlik kopyası alınır. Devam edilsin mi?";
+        if (MessageBox.Show(this, question, "Yedekten geri yükle", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+        await RunBusy(() => _vm.RestoreBackupAsync(backup));
+    }
+    // Key derivation takes a moment; keep the window responsive and show errors in the status line.
+    private async Task RunBusy(Func<Task> action)
+    {
+        BackupButton.IsEnabled = RestoreButton.IsEnabled = false; Cursor = System.Windows.Input.Cursors.Wait;
+        try { await action(); }
+        catch (Exception ex) { _vm.Error(ex); }
+        finally { BackupButton.IsEnabled = RestoreButton.IsEnabled = true; Cursor = null; }
+    }
     private void Add_Click(object sender, RoutedEventArgs e) => new SourceDialog(_vm) { Owner = this }.ShowDialog();
     private void Edit_Click(object sender, RoutedEventArgs e) { if (_vm.SelectedSource != null) new SourceDialog(_vm, _vm.SelectedSource) { Owner = this }.ShowDialog(); }
     private async void Delete_Click(object sender, RoutedEventArgs e)

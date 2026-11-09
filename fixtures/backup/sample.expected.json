@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "created": "2026-11-09T12:00:00+00:00",
+  "appVersion": "1.5.0",
+  "sources": [
+    {
+      "id": "acc",
+      "name": "Örnek Xtream",
+      "kind": "Xtream",
+      "location": "https://example.invalid",
+      "username": "kullanıcı",
+      "password": "p&ss/ğüş",
+      "updated": "2026-11-09T12:00:00+00:00"
+    },
+    {
+      "id": "m3u",
+      "name": "Örnek liste",
+      "kind": "M3uUrl",
+      "location": "https://example.invalid/list.m3u",
+      "username": "",
+      "password": "",
+      "updated": null
+    }
+  ],
+  "channels": [
+    {
+      "id": "EE03F431901259622E76148B71CED2F76EC5586B94682E337AC34D559524712D",
+      "sourceId": "acc",
+      "name": "Kanal Bir",
+      "url": "https://example.invalid/live/kullan%C4%B1c%C4%B1/p%26ss%2F%C4%9F%C3%BC%C5%9F/101.ts",
+      "tvgId": "kanal1.tr",
+      "tvgName": "Kanal Bir",
+      "logo": "",
+      "category": "Ulusal"
+    },
+    {
+      "id": "F4599152E7D2D5172572AC130C868E38FFD61310C4E6A6A3CCF3CD61E877B3E4",
+      "sourceId": "m3u",
+      "name": "ŞİMDİ TV",
+      "url": "https://example.invalid/2",
+      "tvgId": "",
+      "tvgName": "",
+      "logo": "",
+      "category": "Haber"
+    }
+  ],
+  "favorites": [
+    "F4599152E7D2D5172572AC130C868E38FFD61310C4E6A6A3CCF3CD61E877B3E4"
+  ],
+  "recent": [
+    "F4599152E7D2D5172572AC130C868E38FFD61310C4E6A6A3CCF3CD61E877B3E4",
+    "EE03F431901259622E76148B71CED2F76EC5586B94682E337AC34D559524712D"
+  ],
+  "settings": {
+    "theme": "Light",
+    "defaultVolume": 60,
+    "autoReconnect": false,
+    "epgUrl": ""
+  },
+  "layout": {
+    "channels": {
+      "F4599152E7D2D5172572AC130C868E38FFD61310C4E6A6A3CCF3CD61E877B3E4": {
+        "name": "Şimdi",
+        "order": 0,
+        "hidden": false
+      },
+      "EE03F431901259622E76148B71CED2F76EC5586B94682E337AC34D559524712D": {
+        "name": "",
+        "order": 1,
+        "hidden": false
+      }
+    },
+    "hiddenCategories": [
+      "Gizli"
+    ],
+    "favoriteLists": [
+      {
+        "id": "list1",
+        "name": "Spor",
+        "channels": [
+          "EE03F431901259622E76148B71CED2F76EC5586B94682E337AC34D559524712D"
+        ]
+      }
+    ],
+    "shortcuts": {
+      "next": "G"
+    }
+  },
+  "progress": [
+    {
+      "sourceId": "acc",
+      "key": "acc:Movie:12",
+      "positionMs": 45000,
+      "durationMs": 120000,
+      "completed": false,
+      "updated": "2026-11-09T12:00:00+00:00"
+    }
+  ]
+}

@@ -16,6 +16,7 @@ Dosyalar bayt bayt okunur (BOM, Windows-1254, LF). `.gitattributes` bu klasörde
 | `xtream/vod-categories.json` + `vod-streams.json` | `xtream/vod-catalog.expected.json` | Tür `Movie`, kaynak `acc`. |
 | `xtream/series-details-*.json`, `movie-details.json` | `*.expected.json` (`input` ve `result`) | `input` öğesi ayrıntılarla birleştirilir. |
 | `xtream/stream-urls.json` | `xtream/stream-urls.expected.json` | Sıra aynıdır. |
+| `backup/sample.enestv` | `backup/sample.expected.json` | Parola `enestv-fixture-parola`; çözülen içerik (camelCase, sayım türleri metin) beklenenle aynı olmalı. Hızlı test için 10.000 tur. |
 | `search/cases.json` | aynı dosya (`contains` / `equals`, `expected`) | Arama eşleşmesi; beklenen değerler kuralın kendisidir (CORE-SPEC: Arama). |
 | `xmltv/times.json` | aynı dosya (`valid` / `invalid`) | `utc` alanı UTC zamanıdır; `invalid` girdileri boş (null) dönmelidir. |
 | `xmltv/guide.xml` | `xmltv/guide.expected.json` | `{NOW}`, `{NOW+1H}`, `{NOW+2H}`, `{NOW-3D}`, `{NOW-2D}`, `{NOW+9D}`, `{NOW+9D+1H}` yer tutucuları test anındaki UTC zamana göre `yyyyMMddHHmmss +0000` biçiminde doldurulur. Aynı içerik gzip ile sıkıştırılmış olarak da okunmalıdır. |

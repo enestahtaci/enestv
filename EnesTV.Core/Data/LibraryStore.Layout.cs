@@ -6,13 +6,14 @@ namespace EnesTV.Core.Data;
 
 public sealed partial class LibraryStore
 {
-    public Task<LibraryLayout> LoadLayoutAsync(CancellationToken ct = default) => Run(db =>
+    public Task<LibraryLayout> LoadLayoutAsync(CancellationToken ct = default) => Run(LoadLayout, ct);
+    private LibraryLayout LoadLayout(Microsoft.Data.Sqlite.SqliteConnection db)
     {
         using var cmd = db.CreateCommand(); cmd.CommandText = "SELECT value FROM layout WHERE id=1";
         return cmd.ExecuteScalar() is byte[] data
             ? JsonSerializer.Deserialize<LibraryLayout>(_protector.Unprotect(data)) ?? new()
             : new LibraryLayout();
-    }, ct);
+    }
 
     public Task SaveLayoutAsync(LibraryLayout layout, CancellationToken ct = default) => Run(db =>
     {

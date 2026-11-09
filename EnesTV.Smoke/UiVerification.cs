@@ -97,6 +97,15 @@ public static class UiVerification
                     WindowChecks.Caption(main, true);
                     var lightSettings = new SettingsWindow(vm) { Owner = main }; lightSettings.Show(); await Task.Delay(150); WindowChecks.Caption(lightSettings, true); lightSettings.Close();
                     await vm.SaveSettingsAsync(vm.Settings with { Theme = "Dark" }); WindowChecks.Caption(main, false);
+                    // Backup round trip through the app: real DPAPI store, full 600,000-iteration key derivation, safety copy, reload.
+                    var backupPath = Path.Combine(root, "ui-backup.enestv"); var volume = vm.Settings.DefaultVolume; var channelCount = vm.AllChannels.Count;
+                    await vm.ExportBackupAsync(backupPath, "smoke-parola-123");
+                    if (File.ReadAllText(backupPath).Contains("127.0.0.1")) throw new InvalidOperationException("Backup file hides source addresses");
+                    await vm.SaveSettingsAsync(vm.Settings with { DefaultVolume = volume == 10 ? 20 : 10 });
+                    try { await vm.ReadBackupAsync(backupPath, "yanlis-parola-1"); throw new InvalidOperationException("Wrong backup passphrase rejected"); } catch (EnesTV.Core.Services.UserInputException) { }
+                    var safety = await vm.RestoreBackupAsync(await vm.ReadBackupAsync(backupPath, "smoke-parola-123"));
+                    if (vm.Settings.DefaultVolume != volume || vm.AllChannels.Count != channelCount || vm.Channels.Count == 0 || !File.Exists(safety)) throw new InvalidOperationException("Backup restore replaces the library and keeps a safety copy");
+                    Console.WriteLine("PASS Backup export, wrong passphrase, restore with safety copy");
                     var sorted = beats.Order().ToArray();
                     await File.WriteAllTextAsync(Path.Combine(root, "ui-results.json"), JsonSerializer.Serialize(new { channels = 10000, realizedListItems = realized, heartbeatSamples = beats.Count, maxUiGapMs = sorted.LastOrDefault(), p95UiGapMs = sorted.Length == 0 ? 0 : sorted[(int)(sorted.Length * 0.95)], search = true, favorites = true, playback = true, epg = true, settings = true, guide = true, sourceDialog = true, fullscreenMonitorPixels = true, fullscreenOnlyVideo = true, fullscreenButtonAndF11 = true, restoreNormalAndMaximized = true, nativeTitleBarDarkLight = true }, new JsonSerializerOptions { WriteIndented = true }));
                     main.Close(); done.TrySetResult();
