@@ -8,7 +8,7 @@ public partial class App : Application
 {
     public static string DataRoot { get; private set; } = Environment.GetEnvironmentVariable("ENESTV_DATA_DIR") is { Length: > 0 } custom ? System.IO.Path.GetFullPath(custom) : System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "enestv");
     public static SafeLog Log { get; private set; } = new(System.IO.Path.Combine(DataRoot, "logs"));
-    public static LibraryStore Store { get; private set; } = new(System.IO.Path.Combine(DataRoot, "library.db"));
+    public static LibraryStore Store { get; private set; } = new(System.IO.Path.Combine(DataRoot, "library.db"), new EnesTV.Platform.Windows.DpapiSecretProtector());
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);

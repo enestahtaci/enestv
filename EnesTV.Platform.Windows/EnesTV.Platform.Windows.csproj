@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Windows-only services for the platform-neutral EnesTV.Core (target framework comes from Directory.Build.props). -->
+  <ItemGroup>
+    <ProjectReference Include="../EnesTV.Core/EnesTV.Core.csproj" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.14" />
+  </ItemGroup>
+</Project>

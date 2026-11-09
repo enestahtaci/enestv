@@ -10,14 +10,14 @@ public sealed partial class LibraryStore
     {
         using var cmd = db.CreateCommand(); cmd.CommandText = "SELECT value FROM layout WHERE id=1";
         return cmd.ExecuteScalar() is byte[] data
-            ? JsonSerializer.Deserialize<LibraryLayout>(SecretProtection.Unprotect(data)) ?? new()
+            ? JsonSerializer.Deserialize<LibraryLayout>(_protector.Unprotect(data)) ?? new()
             : new LibraryLayout();
     }, ct);
 
     public Task SaveLayoutAsync(LibraryLayout layout, CancellationToken ct = default) => Run(db =>
     {
         Execute(db, "INSERT INTO layout VALUES(1,$value) ON CONFLICT(id) DO UPDATE SET value=$value",
-            ("$value", SecretProtection.Protect(JsonSerializer.Serialize(layout))));
+            ("$value", _protector.Protect(JsonSerializer.Serialize(layout))));
         return true;
     }, ct);
 }

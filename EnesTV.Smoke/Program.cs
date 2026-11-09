@@ -18,13 +18,19 @@ if (args.Contains("--serve"))
 }
 var results = new List<object>();
 void Check(bool condition, string name) { if (!condition) throw new InvalidOperationException(name); results.Add(new { test = name, passed = true }); Console.WriteLine("PASS " + name); }
-var store = new LibraryStore(Path.Combine(output, "test.db")); await store.InitializeAsync(); using var network = new NetworkClient(); var log = new SafeLog(Path.Combine(output, "logs"));
+var protector = new EnesTV.Platform.Windows.DpapiSecretProtector();
+// Libraries written by enestv 1.0–1.4.1 used DPAPI directly with this entropy; they must still open.
+var legacyEntropy = System.Text.Encoding.UTF8.GetBytes("enestv/source/v1");
+var legacy = System.Security.Cryptography.ProtectedData.Protect(System.Text.Encoding.UTF8.GetBytes("test-password"), legacyEntropy, System.Security.Cryptography.DataProtectionScope.CurrentUser);
+var current = protector.Protect("test-password");
+Check(protector.Unprotect(legacy) == "test-password" && System.Text.Encoding.UTF8.GetString(System.Security.Cryptography.ProtectedData.Unprotect(current, legacyEntropy, System.Security.Cryptography.DataProtectionScope.CurrentUser)) == "test-password" && !System.Text.Encoding.UTF8.GetString(current).Contains("test-password"), "DPAPI protector is compatible with existing libraries");
+var store = new LibraryStore(Path.Combine(output, "test.db"), protector); await store.InitializeAsync(); using var network = new NetworkClient(); var log = new SafeLog(Path.Combine(output, "logs"));
 var source = new Source("test", "Local fixture", SourceKind.M3uUrl, new(server.Url + "/redirect"));
 var timer = Stopwatch.StartNew(); var channels = await new PlaylistService(network, store, log).RefreshAsync(source, default); timer.Stop();
 Check(channels.Count == 10000 && channels.Select(c => c.Category).Distinct().Count() == 20, "HTTP redirect → 10000 M3U channels → 20 categories → SQLite");
 results.Add(new { metric = "10000 channel download/parse/encrypted save ms", value = timer.ElapsedMilliseconds });
 await store.SetFavoriteAsync(channels[0].Id, true); await store.AddRecentAsync(channels[0].Id); await store.SaveSettingsAsync(new("Dark", 55, false, server.Url + "/epg.xml"));
-var cached = await new LibraryStore(Path.Combine(output, "test.db")).LoadAsync(); Check(cached.Channels.Count == 10000 && cached.Favorites.Contains(channels[0].Id) && cached.Recent.Count == 1 && cached.Settings.DefaultVolume == 55, "Offline cache and restart persistence");
+var cached = await new LibraryStore(Path.Combine(output, "test.db"), protector).LoadAsync(); Check(cached.Channels.Count == 10000 && cached.Favorites.Contains(channels[0].Id) && cached.Recent.Count == 1 && cached.Settings.DefaultVolume == 55, "Offline cache and restart persistence");
 var xtream = new XtreamService(network); var xtreamChannels = await xtream.LoadAsync(new("xt", "Local account", SourceKind.Xtream, new(server.Url, "test", "test")), default); Check(xtreamChannels.Count == 1, "Xtream authentication/categories/streams");
 try { await xtream.LoadAsync(new("xt", "Wrong", SourceKind.Xtream, new(server.Url, "wrong", "wrong")), default); throw new InvalidOperationException("Expected auth error"); } catch (AuthenticationException) { Check(true, "Wrong Xtream credentials distinguished from network failures"); }
 var epgCount = await new EpgService(network, store).RefreshAsync(server.Url + "/epg.xml", channels.Select(c => c.TvgId).ToHashSet(), default); var epg = await store.NowNextAsync(); Check(epgCount == 400 && epg.Count == 200, "XMLTV streaming import and now/next matching");

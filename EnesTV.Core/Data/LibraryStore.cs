@@ -5,9 +5,11 @@ using Microsoft.Data.Sqlite;
 
 namespace EnesTV.Core.Data;
 
-public sealed partial class LibraryStore(string path)
+// Data at rest is encrypted through the platform's ISecretProtector (Windows: DPAPI).
+public sealed partial class LibraryStore(string path, ISecretProtector protector)
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
+    private readonly ISecretProtector _protector = protector;
     private SqliteConnection Open()
     {
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
@@ -74,28 +76,28 @@ public sealed partial class LibraryStore(string path)
     {
         var sources = new List<Source>(); var channels = new List<Channel>(); var fav = new HashSet<string>(); var recent = new List<string>();
         using var cmd = db.CreateCommand(); cmd.CommandText = "SELECT id,name,kind,secret,updated FROM sources";
-        using (var r = cmd.ExecuteReader()) while (r.Read()) sources.Add(new(r.GetString(0), r.GetString(1), (SourceKind)r.GetInt32(2), JsonSerializer.Deserialize<SourceSecret>(SecretProtection.Unprotect((byte[])r[3]))!, r.IsDBNull(4) ? null : DateTimeOffset.Parse(r.GetString(4))));
+        using (var r = cmd.ExecuteReader()) while (r.Read()) sources.Add(new(r.GetString(0), r.GetString(1), (SourceKind)r.GetInt32(2), JsonSerializer.Deserialize<SourceSecret>(_protector.Unprotect((byte[])r[3]))!, r.IsDBNull(4) ? null : DateTimeOffset.Parse(r.GetString(4))));
         cmd.CommandText = "SELECT metadata FROM channels";
-        using (var r = cmd.ExecuteReader()) while (r.Read()) { ct.ThrowIfCancellationRequested(); channels.Add(JsonSerializer.Deserialize<Channel>(SecretProtection.Unprotect((byte[])r[0]))!); }
+        using (var r = cmd.ExecuteReader()) while (r.Read()) { ct.ThrowIfCancellationRequested(); channels.Add(JsonSerializer.Deserialize<Channel>(_protector.Unprotect((byte[])r[0]))!); }
         cmd.CommandText = "SELECT channel_id FROM favorites";
         using (var r = cmd.ExecuteReader()) while (r.Read()) fav.Add(r.GetString(0));
         cmd.CommandText = "SELECT channel_id FROM recent ORDER BY watched DESC LIMIT 20";
         using (var r = cmd.ExecuteReader()) while (r.Read()) recent.Add(r.GetString(0));
         cmd.CommandText = "SELECT value FROM settings WHERE id=1";
         var value = cmd.ExecuteScalar();
-        var settings = value is byte[] bytes ? JsonSerializer.Deserialize<UserSettings>(SecretProtection.Unprotect(bytes))! : new UserSettings();
+        var settings = value is byte[] bytes ? JsonSerializer.Deserialize<UserSettings>(_protector.Unprotect(bytes))! : new UserSettings();
         return new Library(sources, channels, fav, recent, settings);
     }, ct);
     public Task SaveSourceAsync(Source source, IReadOnlyList<Channel> channels, CancellationToken ct = default) => Run(db =>
     {
         using var tx = db.BeginTransaction();
-        Execute(db, "INSERT INTO sources VALUES($id,$name,$kind,$secret,$updated) ON CONFLICT(id) DO UPDATE SET name=$name,kind=$kind,secret=$secret,updated=$updated", ("$id", source.Id), ("$name", source.Name), ("$kind", (int)source.Kind), ("$secret", SecretProtection.Protect(JsonSerializer.Serialize(source.Secret))), ("$updated", (object?)source.Updated?.ToString("O") ?? DBNull.Value));
+        Execute(db, "INSERT INTO sources VALUES($id,$name,$kind,$secret,$updated) ON CONFLICT(id) DO UPDATE SET name=$name,kind=$kind,secret=$secret,updated=$updated", ("$id", source.Id), ("$name", source.Name), ("$kind", (int)source.Kind), ("$secret", _protector.Protect(JsonSerializer.Serialize(source.Secret))), ("$updated", (object?)source.Updated?.ToString("O") ?? DBNull.Value));
         Execute(db, "CREATE TEMP TABLE incoming(id TEXT PRIMARY KEY)");
         using var insert = db.CreateCommand(); insert.CommandText = "INSERT INTO channels VALUES($id,$source,$data) ON CONFLICT(id) DO UPDATE SET metadata=$data; INSERT OR IGNORE INTO incoming VALUES($id);";
         insert.Parameters.Add("$id", SqliteType.Text); insert.Parameters.AddWithValue("$source", source.Id); insert.Parameters.Add("$data", SqliteType.Blob); insert.Prepare();
         foreach (var channel in channels)
         {
-            ct.ThrowIfCancellationRequested(); insert.Parameters["$id"].Value = channel.Id; insert.Parameters["$data"].Value = SecretProtection.Protect(JsonSerializer.Serialize(channel)); insert.ExecuteNonQuery();
+            ct.ThrowIfCancellationRequested(); insert.Parameters["$id"].Value = channel.Id; insert.Parameters["$data"].Value = _protector.Protect(JsonSerializer.Serialize(channel)); insert.ExecuteNonQuery();
         }
         Execute(db, "DELETE FROM channels WHERE source_id=$id AND id NOT IN(SELECT id FROM incoming)", ("$id", source.Id));
         tx.Commit(); return true;
@@ -109,5 +111,5 @@ public sealed partial class LibraryStore(string path)
         Execute(db, "INSERT INTO recent VALUES($id,$now) ON CONFLICT(channel_id) DO UPDATE SET watched=$now", ("$id", id), ("$now", DateTime.UtcNow.Ticks));
         Execute(db, "DELETE FROM recent WHERE channel_id NOT IN(SELECT channel_id FROM recent ORDER BY watched DESC LIMIT 20)"); tx.Commit(); return true;
     }, ct);
-    public Task SaveSettingsAsync(UserSettings settings, CancellationToken ct = default) => Run(db => { Execute(db, "INSERT INTO settings VALUES(1,$value) ON CONFLICT(id) DO UPDATE SET value=$value", ("$value", SecretProtection.Protect(JsonSerializer.Serialize(settings)))); return true; }, ct);
+    public Task SaveSettingsAsync(UserSettings settings, CancellationToken ct = default) => Run(db => { Execute(db, "INSERT INTO settings VALUES(1,$value) ON CONFLICT(id) DO UPDATE SET value=$value", ("$value", _protector.Protect(JsonSerializer.Serialize(settings)))); return true; }, ct);
 }

@@ -39,7 +39,7 @@ public sealed class VodTests
         var root = Path.Combine(Path.GetTempPath(), "enestv-vod-" + Guid.NewGuid()); Directory.CreateDirectory(root);
         try
         {
-            var path = Path.Combine(root, "library.db"); var store = new LibraryStore(path); await store.InitializeAsync();
+            var path = Path.Combine(root, "library.db"); var store = new LibraryStore(path, TestSecretProtector.Instance); await store.InitializeAsync();
             var source = new Source("s", "Account", SourceKind.Xtream, new("https://example.invalid", "u", "p"));
             await store.SaveSourceAsync(source, []); await store.SaveLayoutAsync(new() { HiddenCategories = ["Hidden"] });
             using (var db = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = path, Pooling = false }.ToString()))
@@ -48,7 +48,7 @@ public sealed class VodTests
             var item = new VodItem("1", "s", VodKind.Movie, "Private title", "Cinema");
             await store.SaveVodCatalogAsync("s", VodKind.Movie, new([item], DateTimeOffset.UtcNow));
             await store.SaveProgressAsync("s", new(item.Key, 45000, 120000, false, DateTimeOffset.UtcNow));
-            var reopened = new LibraryStore(path); await reopened.InitializeAsync();
+            var reopened = new LibraryStore(path, TestSecretProtector.Instance); await reopened.InitializeAsync();
             Assert.Contains("Hidden", (await reopened.LoadLayoutAsync()).HiddenCategories);
             Assert.Equal("Private title", (await reopened.LoadVodCatalogAsync("s", VodKind.Movie))!.Items[0].Name);
             var p = (await reopened.LoadProgressAsync("s"))[item.Key]; Assert.Equal(45000, p.ResumeMs);

@@ -13,7 +13,7 @@ public sealed class LayoutTests
         var root = Path.Combine(Path.GetTempPath(), "enestv-layout-" + Guid.NewGuid()); Directory.CreateDirectory(root);
         try
         {
-            var path = Path.Combine(root, "library.db"); var store = new LibraryStore(path);
+            var path = Path.Combine(root, "library.db"); var store = new LibraryStore(path, TestSecretProtector.Instance);
             await store.InitializeAsync();
             var source = new Source("s", "Fixture", SourceKind.M3uUrl, new("https://example.invalid/list"));
             Channel[] channels = [new("a", "s", "Original", "https://example.invalid/a"), new("b", "s", "Second", "https://example.invalid/b")];
@@ -23,7 +23,7 @@ public sealed class LayoutTests
             {
                 db.Open(); using var cmd = db.CreateCommand(); cmd.CommandText = "DROP TABLE layout; PRAGMA user_version=1"; cmd.ExecuteNonQuery();
             }
-            var upgraded = new LibraryStore(path); await upgraded.InitializeAsync(); await upgraded.InitializeAsync();
+            var upgraded = new LibraryStore(path, TestSecretProtector.Instance); await upgraded.InitializeAsync(); await upgraded.InitializeAsync();
             Assert.Empty((await upgraded.LoadLayoutAsync()).Channels);
             var layout = new LibraryLayout
             {
@@ -34,7 +34,7 @@ public sealed class LayoutTests
             };
             await upgraded.SaveLayoutAsync(layout);
             await upgraded.SaveSourceAsync(source, channels); // Refresh must not overwrite user layout.
-            var reopened = new LibraryStore(path); await reopened.InitializeAsync();
+            var reopened = new LibraryStore(path, TestSecretProtector.Instance); await reopened.InitializeAsync();
             var library = await reopened.LoadAsync(); var restored = await reopened.LoadLayoutAsync();
             Assert.Single(library.Sources); Assert.Contains("a", library.Favorites); Assert.Equal("a", library.Recent[0]);
             Assert.Equal("Original", library.Channels.First(x => x.Id == "a").Name);

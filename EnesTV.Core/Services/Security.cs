@@ -1,13 +1,13 @@
-using System.Security.Cryptography;
-using System.Text;
-
 namespace EnesTV.Core.Services;
 
-public static class SecretProtection
+/// <summary>
+/// Encrypts library data at rest (accounts, channel lists, settings, progress). The core stays platform neutral:
+/// Windows uses DPAPI (EnesTV.Platform.Windows); Android/iOS implementations will wrap a data key in Keystore/Keychain.
+/// </summary>
+public interface ISecretProtector
 {
-    private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("enestv/source/v1");
-    public static byte[] Protect(string value) => ProtectedData.Protect(Encoding.UTF8.GetBytes(value), Entropy, DataProtectionScope.CurrentUser);
-    public static string Unprotect(byte[] value) => Encoding.UTF8.GetString(ProtectedData.Unprotect(value, Entropy, DataProtectionScope.CurrentUser));
+    byte[] Protect(string value);
+    string Unprotect(byte[] value);
 }
 
 public sealed class SafeLog(string directory)

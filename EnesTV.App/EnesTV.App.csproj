@@ -10,6 +10,7 @@
   <ItemGroup>
     <Resource Include="Assets\enestv.ico" />
     <ProjectReference Include="../EnesTV.Core/EnesTV.Core.csproj" />
+    <ProjectReference Include="../EnesTV.Platform.Windows/EnesTV.Platform.Windows.csproj" />
     <PackageReference Include="LibVLCSharp.WPF" Version="3.10.1" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.23.1" />
   </ItemGroup>

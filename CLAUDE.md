@@ -6,7 +6,9 @@ C# / .NET 10 / WPF / MVVM · LibVLCSharp(.WPF) 3.10.1 + VideoLAN.LibVLC.Windows 
 Uygulama yayın, liste veya hesap içermez; kullanıcı kendi M3U/Xtream kaynağını ekler. Veriler `%LOCALAPPDATA%\enestv` (veya `ENESTV_DATA_DIR`).
 
 ## Yapı
-- `EnesTV.Core/` — modeller, M3U/Xtream/XMLTV ayrıştırıcıları, SQLite store, ağ, DPAPI (UI bağımsız).
+- `EnesTV.Core/` — modeller, M3U/Xtream/XMLTV ayrıştırıcıları, SQLite store, ağ. **Platformdan bağımsız** (`net10.0`, Windows
+  API'si yok). Şifreleme `ISecretProtector` arayüzüyle dışarıdan verilir (`LibraryStore(path, protector)`).
+- `EnesTV.Platform.Windows/` — Windows servisleri: `DpapiSecretProtector` (eski kütüphanelerle uyumlu entropy; değiştirme).
 - `EnesTV.App/` — WPF uygulaması, **tek ana pencere**.
   - `MainWindow.xaml` — sol menü (Canlı TV, Favoriler, Son izlenenler, Kategoriler, Filmler, Diziler); orta sütun kanal listesi
     veya film/dizi kataloğu; sağda tek ortak video alanı + moda göre kontroller/EPG/detaylar.
@@ -76,6 +78,7 @@ powershell -ExecutionPolicy Bypass -File Installer\Build-Setup.ps1 -InnoCompiler
 - `TreatWarningsAsErrors=true` — uyarısız derleme zorunlu.
 
 ## Bilinen açık işler
-- Çok platform planı Faz 0: çekirdeği platformdan bağımsız yapmak (`ISecretProtector`), ortak test verileri, yedekle/geri yükle.
+- Çok platform planı Faz 0: .NET 10 (0.1) ve platformdan bağımsız çekirdek (0.2) tamam; kalan: ortak test verileri ve
+  `docs/CORE-SPEC.md` (0.3), yedekle/geri yükle (0.4). Birim testleri `net10.0`'da `TestSecretProtector` ile çalışır.
 - Her Release'te `RELEASE-CHECKLIST.md` izlenir; v1.4.0 düzeni (kaynak arşivleri, `SHA256SUMS.txt`) örnektir.
 - VLC eklenti ayıklama önerisi ertelendi.
