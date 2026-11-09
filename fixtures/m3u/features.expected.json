@@ -1,0 +1,56 @@
+{
+  "sourceId": "acc",
+  "baseUri": "https://example.invalid/lists/main.m3u",
+  "channels": [
+    {
+      "id": "ADA313DD3571BBAE1284A296CD8E05F837EAC2C2394D4C917297CFADFF35E7D2",
+      "sourceId": "acc",
+      "name": "Single Quotes",
+      "url": "http://example.invalid/a.ts",
+      "tvgId": "single",
+      "tvgName": "",
+      "logo": "",
+      "category": "Spor"
+    },
+    {
+      "id": "6BCF79AA969A895EEADD40979E62BF2FCD260726A7CCE321C0AABCA4BEC7248B",
+      "sourceId": "acc",
+      "name": "Fallback Name",
+      "url": "https://example.invalid/lists/relative/b.m3u8",
+      "tvgId": "",
+      "tvgName": "Fallback Name",
+      "logo": "",
+      "category": "Haber"
+    },
+    {
+      "id": "D0135CA29190AAB3D74889B082405BB747A3F49A57A014A8C2668B25D4E1717A",
+      "sourceId": "acc",
+      "name": "No Group",
+      "url": "rtmp://example.invalid/live/c",
+      "tvgId": "",
+      "tvgName": "",
+      "logo": "https://example.invalid/logos/c.png",
+      "category": "Uncategorized"
+    },
+    {
+      "id": "1D31D68CDF4C4531336D6776735E12081D78B8B10F101EBC6C57C88A56A94550",
+      "sourceId": "acc",
+      "name": "Empty Group",
+      "url": "https://example.invalid/e",
+      "tvgId": "",
+      "tvgName": "",
+      "logo": "",
+      "category": "Uncategorized"
+    },
+    {
+      "id": "3994C8302161C6DBF051F4E107059308E590F1D68A5B86DF753CC953DEA1A29E",
+      "sourceId": "acc",
+      "name": "İsimsiz kanal",
+      "url": "https://example.invalid/no-extinf",
+      "tvgId": "",
+      "tvgName": "",
+      "logo": "",
+      "category": "Uncategorized"
+    }
+  ]
+}

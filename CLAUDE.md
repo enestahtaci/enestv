@@ -78,7 +78,13 @@ powershell -ExecutionPolicy Bypass -File Installer\Build-Setup.ps1 -InnoCompiler
 - `TreatWarningsAsErrors=true` — uyarısız derleme zorunlu.
 
 ## Bilinen açık işler
-- Çok platform planı Faz 0: .NET 10 (0.1) ve platformdan bağımsız çekirdek (0.2) tamam; kalan: ortak test verileri ve
-  `docs/CORE-SPEC.md` (0.3), yedekle/geri yükle (0.4). Birim testleri `net10.0`'da `TestSecretProtector` ile çalışır.
+- Çok platform planı Faz 0: .NET 10 (0.1), platformdan bağımsız çekirdek (0.2), ortak test verileri ve davranış
+  belgesi (0.3) tamam; kalan: yedekle/geri yükle (0.4). Birim testleri `net10.0`'da `TestSecretProtector` ile çalışır.
+- Türkçe İ/i, I/ı aramada eşleşmiyor (`docs/CORE-SPEC.md` §9.1); düzeltme bekliyor.
+
+## Çekirdek kuralları
+- Ayrıştırma/kimlik/EPG kuralları `docs/CORE-SPEC.md`'de; ölçülebilir hâli `fixtures/` (dilden bağımsız, `FixtureTests`).
+- Çekirdek davranışı değişirse: kod → `fixtures/**/*.expected.json` (çekirdeğe ürettirip gözden geçir) → CORE-SPEC.md.
+- `fixtures/` bayt bayt okunur (`.gitattributes` ile satır sonu dönüşümü kapalı); dosyaları editörde yeniden kaydetme.
 - Her Release'te `RELEASE-CHECKLIST.md` izlenir; v1.4.0 düzeni (kaynak arşivleri, `SHA256SUMS.txt`) örnektir.
 - VLC eklenti ayıklama önerisi ertelendi.

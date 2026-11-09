@@ -27,22 +27,24 @@ public sealed partial class XtreamService(NetworkClient network)
         }
         using var categories = await GetJsonAsync(ApiUrl(source.Secret, "get_live_categories"), ct);
         using var streams = await GetJsonAsync(ApiUrl(source.Secret, "get_live_streams"), ct);
-        return await Task.Run<IReadOnlyList<Channel>>(() =>
+        return await Task.Run(() => ParseLiveStreams(source.Id, source.Secret, categories.RootElement, streams.RootElement, ct), ct);
+    }
+    // Pure parsing step of LoadAsync (no network), shared with the fixture tests and the core spec.
+    public static IReadOnlyList<Channel> ParseLiveStreams(string sourceId, SourceSecret secret, JsonElement categories, JsonElement streams, CancellationToken ct = default)
+    {
+        var groups = new Dictionary<string, string>();
+        if (categories.ValueKind == JsonValueKind.Array) foreach (var c in categories.EnumerateArray()) groups[Value(c, "category_id")] = Value(c, "category_name");
+        if (streams.ValueKind != JsonValueKind.Array) throw new UserInputException("Sunucu geçerli bir canlı kanal listesi döndürmedi.");
+        var list = new List<Channel>(); var seen = new HashSet<string>(); var server = NormalizeServer(secret.Location);
+        foreach (var item in streams.EnumerateArray())
         {
-            var groups = new Dictionary<string, string>();
-            if (categories.RootElement.ValueKind == JsonValueKind.Array) foreach (var c in categories.RootElement.EnumerateArray()) groups[Value(c, "category_id")] = Value(c, "category_name");
-            if (streams.RootElement.ValueKind != JsonValueKind.Array) throw new UserInputException("Sunucu geçerli bir canlı kanal listesi döndürmedi.");
-            var list = new List<Channel>(); var seen = new HashSet<string>(); var secret = source.Secret;
-            foreach (var item in streams.RootElement.EnumerateArray())
-            {
-                ct.ThrowIfCancellationRequested(); var id = Value(item, "stream_id"); if (id.Length == 0) continue;
-                var name = Value(item, "name"); if (name.Length == 0) name = "Kanal " + id;
-                var url = $"{NormalizeServer(secret.Location)}/live/{Uri.EscapeDataString(secret.Username)}/{Uri.EscapeDataString(secret.Password)}/{Uri.EscapeDataString(id)}.ts";
-                var key = Channel.Key(source.Id, id, name);
-                if (seen.Add(key)) list.Add(new(key, source.Id, name, url, Value(item, "epg_channel_id"), name, Value(item, "stream_icon"), groups.GetValueOrDefault(Value(item, "category_id"), "Uncategorized")));
-            }
-            return list;
-        }, ct);
+            ct.ThrowIfCancellationRequested(); var id = Value(item, "stream_id"); if (id.Length == 0) continue;
+            var name = Value(item, "name"); if (name.Length == 0) name = "Kanal " + id;
+            var url = $"{server}/live/{Uri.EscapeDataString(secret.Username)}/{Uri.EscapeDataString(secret.Password)}/{Uri.EscapeDataString(id)}.ts";
+            var key = Channel.Key(sourceId, id, name);
+            if (seen.Add(key)) list.Add(new(key, sourceId, name, url, Value(item, "epg_channel_id"), name, Value(item, "stream_icon"), groups.GetValueOrDefault(Value(item, "category_id"), "Uncategorized")));
+        }
+        return list;
     }
     private async Task<JsonDocument> GetJsonAsync(string url, CancellationToken ct)
     {

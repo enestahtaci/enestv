@@ -1,0 +1,22 @@
+{
+  "channels": [
+    "a"
+  ],
+  "programmes": [
+    {
+      "channelId": "a",
+      "title": "One",
+      "description": "First"
+    },
+    {
+      "channelId": "a",
+      "title": "Two",
+      "description": ""
+    },
+    {
+      "channelId": "a",
+      "title": "İsimsiz program",
+      "description": ""
+    }
+  ]
+}

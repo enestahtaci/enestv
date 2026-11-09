@@ -1,0 +1,26 @@
+{
+  "sourceId": "tr",
+  "baseUri": null,
+  "channels": [
+    {
+      "id": "710D36DC031E9D73D0E4AA6806CD9539B714824D2C5F3F8EEE42DAA82AAFB9D0",
+      "sourceId": "tr",
+      "name": "Şimdi Türkçe İçerik",
+      "url": "https://example.invalid/tr1",
+      "tvgId": "",
+      "tvgName": "",
+      "logo": "",
+      "category": "Ulusal Kanallar"
+    },
+    {
+      "id": "5EFC40DC532208C04D3A58FB391A94D30F7D6206507A3C18458CCAED224E99CE",
+      "sourceId": "tr",
+      "name": "Öğrenci Ğ ı ş",
+      "url": "https://example.invalid/tr2",
+      "tvgId": "",
+      "tvgName": "",
+      "logo": "",
+      "category": "Çocuk"
+    }
+  ]
+}

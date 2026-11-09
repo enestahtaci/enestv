@@ -1,0 +1,35 @@
+{
+  "sourceId": "acc",
+  "channels": [
+    {
+      "id": "EE03F431901259622E76148B71CED2F76EC5586B94682E337AC34D559524712D",
+      "sourceId": "acc",
+      "name": "Kanal Bir",
+      "url": "https://example.invalid/sub/live/user%2Fname/p%26ss/101.ts",
+      "tvgId": "kanal1.tr",
+      "tvgName": "Kanal Bir",
+      "logo": "https://example.invalid/k1.png",
+      "category": "Ulusal"
+    },
+    {
+      "id": "959AD5C4F7DFB6F733FFEBFA01F1CEEE46AE0ED2093417971B5BB955DAFEE78C",
+      "sourceId": "acc",
+      "name": "Kanal 102",
+      "url": "https://example.invalid/sub/live/user%2Fname/p%26ss/102.ts",
+      "tvgId": "",
+      "tvgName": "Kanal 102",
+      "logo": "",
+      "category": "Spor"
+    },
+    {
+      "id": "D09C765515CD8E4032727BF423B01E1C7ADE24FA51B456F979251B3F5082A3EC",
+      "sourceId": "acc",
+      "name": "Kategorisiz",
+      "url": "https://example.invalid/sub/live/user%2Fname/p%26ss/103.ts",
+      "tvgId": "",
+      "tvgName": "Kategorisiz",
+      "logo": "",
+      "category": "Uncategorized"
+    }
+  ]
+}

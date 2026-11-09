@@ -1,0 +1,14 @@
+﻿#EXTM3U
+#EXTINF:-1 tvg-id='single' group-title='Spor',Single Quotes
+http://example.invalid/a.ts
+#EXTINF:-1 tvg-name="Fallback Name"
+#EXTGRP:Haber
+relative/b.m3u8
+#EXTINF:-1 tvg-logo=/logos/c.png,No Group
+rtmp://example.invalid/live/c
+#EXTINF:-1,Unsupported Scheme
+ftp://example.invalid/d
+#EXTINF:-1 group-title="",Empty Group
+https://example.invalid/e
+
+https://example.invalid/no-extinf

@@ -1,0 +1,32 @@
+{
+  "sourceId": "acc",
+  "kind": "Movie",
+  "items": [
+    {
+      "id": "12",
+      "sourceId": "acc",
+      "kind": "Movie",
+      "name": "Film",
+      "category": "Drama",
+      "poster": "https://example.invalid/p.jpg",
+      "plot": "",
+      "year": "2024",
+      "rating": "7.5",
+      "extension": "mkv",
+      "key": "acc:Movie:12"
+    },
+    {
+      "id": "13",
+      "sourceId": "acc",
+      "kind": "Movie",
+      "name": "İsimsiz içerik",
+      "category": "Diğer",
+      "poster": "",
+      "plot": "",
+      "year": "",
+      "rating": "",
+      "extension": "mp4",
+      "key": "acc:Movie:13"
+    }
+  ]
+}

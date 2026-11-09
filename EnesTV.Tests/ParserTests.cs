@@ -5,17 +5,7 @@ namespace EnesTV.Tests;
 
 public class ParserTests
 {
-    [Fact] public void ReadsMetadataCommasAndDuplicates()
-    {
-        const string text = "#EXTM3U\n#EXTINF:-1 tvg-id=\"one\" tvg-name=\"One\" tvg-logo=\"logo.png\" group-title=\"News, Live\",One HD\nhttps://example.invalid/1\n#EXTINF:-1,One HD\nhttps://example.invalid/1";
-        var channels = M3uParser.Parse(new StringReader(text), "s", new Uri("https://example.invalid/list"));
-        var c = Assert.Single(channels); Assert.Equal("one", c.TvgId); Assert.Equal("News, Live", c.Category); Assert.Equal("https://example.invalid/logo.png", c.Logo);
-    }
-    [Fact] public void MalformedMetadataDoesNotLoseFollowingChannels()
-    {
-        var channels = M3uParser.Parse(new StringReader("#EXTINF:garbage tvg-name=\"Broken\nhttps://example.invalid/1\n#EXTINF:-1,Good\nhttps://example.invalid/2"), "s");
-        Assert.Equal(2, channels.Count); Assert.Equal("Good", channels[1].Name); Assert.Equal("Uncategorized", channels[1].Category);
-    }
+    // Format rules (metadata, quotes, duplicates, malformed lines, encodings) are covered by FixtureTests.
     [Fact] public void HandlesTenThousandChannels()
     {
         var channels = M3uParser.Parse(new StringReader(Fixtures.LargePlaylist()), "large"); Assert.Equal(10000, channels.Count);

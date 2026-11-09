@@ -1,0 +1,7 @@
+[
+  {"stream_id":101,"name":"Kanal Bir","category_id":"1","epg_channel_id":"kanal1.tr","stream_icon":"https://example.invalid/k1.png"},
+  {"stream_id":"102","name":"","category_id":"2"},
+  {"stream_id":103,"name":"Kategorisiz","category_id":"99"},
+  {"stream_id":101,"name":"Kanal Bir","category_id":"1"},
+  {"name":"Kimliksiz"}
+]

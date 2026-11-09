@@ -1,0 +1,31 @@
+{
+  "input": {
+    "id": "8",
+    "sourceId": "acc",
+    "kind": "Movie",
+    "name": "Film",
+    "category": "Other",
+    "poster": "",
+    "plot": "",
+    "year": "",
+    "rating": "",
+    "extension": "mp4",
+    "key": "acc:Movie:8"
+  },
+  "result": {
+    "item": {
+      "id": "8",
+      "sourceId": "acc",
+      "kind": "Movie",
+      "name": "Film",
+      "category": "Other",
+      "poster": "https://example.invalid/poster",
+      "plot": "Plot",
+      "year": "2023-05-01",
+      "rating": "8",
+      "extension": "mkv",
+      "key": "acc:Movie:8"
+    },
+    "episodes": []
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "input": {
+    "id": "s1",
+    "sourceId": "acc",
+    "kind": "Series",
+    "name": "Dizi",
+    "category": "Drama",
+    "poster": "",
+    "plot": "",
+    "year": "",
+    "rating": "",
+    "extension": "mp4",
+    "key": "acc:Series:s1"
+  },
+  "result": {
+    "item": {
+      "id": "s1",
+      "sourceId": "acc",
+      "kind": "Series",
+      "name": "Dizi",
+      "category": "Drama",
+      "poster": "",
+      "plot": "",
+      "year": "",
+      "rating": "",
+      "extension": "mp4",
+      "key": "acc:Series:s1"
+    },
+    "episodes": [
+      {
+        "id": "a1",
+        "season": 1,
+        "number": 1,
+        "name": "Sezon bir bölüm",
+        "extension": "mp4",
+        "plot": "",
+        "poster": ""
+      },
+      {
+        "id": "b1",
+        "season": 2,
+        "number": 2,
+        "name": "Bölüm",
+        "extension": "mp4",
+        "plot": "",
+        "poster": ""
+      }
+    ]
+  }
+}

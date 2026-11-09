@@ -1,0 +1,15 @@
+{
+  "valid": [
+    { "input": "example.com", "expected": "https://example.com" },
+    { "input": "http://example.com", "expected": "http://example.com" },
+    { "input": "https://example.com/", "expected": "https://example.com" },
+    { "input": " https://example.com:8443/sub/ ", "expected": "https://example.com:8443/sub" },
+    { "input": "https://example.com/player_api.php", "expected": "https://example.com" }
+  ],
+  "rejected": [
+    "file:///c:/test",
+    "https://user:pass@example.com",
+    "https://example.com?password=a",
+    "https://example.com#fragment"
+  ]
+}

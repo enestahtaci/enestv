@@ -1,0 +1,1 @@
+[{"stream_id":12,"name":"Film","category_id":"1","container_extension":"mkv","stream_icon":"https://example.invalid/p.jpg","year":"2024","rating":"7.5"},{"stream_id":12},{"stream_id":13,"name":null,"container_extension":"../bad"},{}]

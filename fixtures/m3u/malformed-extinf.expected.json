@@ -1,0 +1,26 @@
+{
+  "sourceId": "s",
+  "baseUri": null,
+  "channels": [
+    {
+      "id": "D0C3F984FC180224B3EA82BF700CEC6FABD0C8A715CFDC89E1C1279FE8CF7ECE",
+      "sourceId": "s",
+      "name": "\"Broken",
+      "url": "https://example.invalid/1",
+      "tvgId": "",
+      "tvgName": "\"Broken",
+      "logo": "",
+      "category": "Uncategorized"
+    },
+    {
+      "id": "E5C610C9A1897B447DDC36B5E797FDF25C3D20B7892B42ADDB657D1EF6A879DB",
+      "sourceId": "s",
+      "name": "Good",
+      "url": "https://example.invalid/2",
+      "tvgId": "",
+      "tvgName": "",
+      "logo": "",
+      "category": "Uncategorized"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tv SYSTEM "xmltv.dtd">
+<tv>
+  <programme channel="a" start="{NOW}" stop="{NOW+1H}"><title>One</title><desc>First</desc></programme>
+  <programme channel="a" start="{NOW}" stop="{NOW+1H}"><title>Two</title></programme>
+  <programme channel="b" start="{NOW}" stop="{NOW+1H}"><title>Other channel</title></programme>
+  <programme channel="a" start="{NOW+1H}" stop="{NOW}"><title>Ends before start</title></programme>
+  <programme channel="a" start="{NOW+9D}" stop="{NOW+9D+1H}"><title>Too far ahead</title></programme>
+  <programme channel="a" start="{NOW-3D}" stop="{NOW-2D}"><title>Too old</title></programme>
+  <programme channel="a" start="{NOW+1H}" stop="{NOW+2H}"></programme>
+</tv>

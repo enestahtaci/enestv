@@ -1,0 +1,50 @@
+{
+  "input": {
+    "id": "s1",
+    "sourceId": "acc",
+    "kind": "Series",
+    "name": "Dizi",
+    "category": "Drama",
+    "poster": "",
+    "plot": "",
+    "year": "",
+    "rating": "",
+    "extension": "mp4",
+    "key": "acc:Series:s1"
+  },
+  "result": {
+    "item": {
+      "id": "s1",
+      "sourceId": "acc",
+      "kind": "Series",
+      "name": "Dizi",
+      "category": "Drama",
+      "poster": "https://example.invalid/s.jpg",
+      "plot": "Dizi özeti",
+      "year": "",
+      "rating": "",
+      "extension": "mp4",
+      "key": "acc:Series:s1"
+    },
+    "episodes": [
+      {
+        "id": "10",
+        "season": 1,
+        "number": 1,
+        "name": "A",
+        "extension": "mkv",
+        "plot": "Bölüm özeti",
+        "poster": "https://example.invalid/s.jpg"
+      },
+      {
+        "id": "20",
+        "season": 2,
+        "number": 2,
+        "name": "B",
+        "extension": "mp4",
+        "plot": "",
+        "poster": "https://example.invalid/s.jpg"
+      }
+    ]
+  }
+}

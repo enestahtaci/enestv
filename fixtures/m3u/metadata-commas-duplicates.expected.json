@@ -1,0 +1,16 @@
+{
+  "sourceId": "s",
+  "baseUri": "https://example.invalid/list",
+  "channels": [
+    {
+      "id": "F1C2C42F270A3B10217F6A7592FCC6C2D595C5E5CA37AB0B51C8428891187AC3",
+      "sourceId": "s",
+      "name": "One HD",
+      "url": "https://example.invalid/1",
+      "tvgId": "one",
+      "tvgName": "One",
+      "logo": "https://example.invalid/logo.png",
+      "category": "News, Live"
+    }
+  ]
+}

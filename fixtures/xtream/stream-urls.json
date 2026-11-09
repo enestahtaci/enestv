@@ -1,0 +1,5 @@
+[
+  { "server": "https://example.invalid/sub", "username": "user/name", "password": "p&ss", "id": "8", "extension": "mkv", "episode": false },
+  { "server": "https://example.invalid", "username": "u", "password": "p", "id": "8", "extension": "../bad", "episode": true },
+  { "server": "example.invalid", "username": "u", "password": "p", "id": "a b", "extension": "MP4", "episode": false }
+]

@@ -1,0 +1,2 @@
+# Test fixtures are read byte for byte by every platform's core (BOM, Windows-1254, LF): never convert them.
+fixtures/** -text
