@@ -1,0 +1,27 @@
+{
+  "contains": [
+    { "text": "ŞİMDİ TV", "query": "şimdi", "expected": true },
+    { "text": "İSTANBUL", "query": "istanbul", "expected": true },
+    { "text": "istanbul haber", "query": "İSTANBUL", "expected": true },
+    { "text": "ISPARTA", "query": "ısparta", "expected": true },
+    { "text": "Isparta Haber", "query": "ISPARTA", "expected": true },
+    { "text": "BEIN SPORTS 1", "query": "bein", "expected": true },
+    { "text": "beIN Sports", "query": "BEİN", "expected": true },
+    { "text": "Çocuk", "query": "ÇOCUK", "expected": true },
+    { "text": "Ağaç Belgesel", "query": "AĞAÇ", "expected": true },
+    { "text": "Öğrenci Üniversite", "query": "öğrenci üni", "expected": true },
+    { "text": "Kanal 7", "query": "  kanal  ", "expected": true },
+    { "text": "Kanal 7", "query": "", "expected": true },
+    { "text": "Kanal 7", "query": "   ", "expected": true },
+    { "text": "Spor", "query": "spor haber", "expected": false },
+    { "text": "Cocuk", "query": "çocuk", "expected": false },
+    { "text": "Seker", "query": "şeker", "expected": false },
+    { "text": "TV", "query": "tv8", "expected": false }
+  ],
+  "equals": [
+    { "a": "Spor", "b": "SPOR", "expected": true },
+    { "a": "İzle", "b": "izle", "expected": true },
+    { "a": "Dizi", "b": "DİZİ", "expected": true },
+    { "a": "Dizi", "b": "Dizi ", "expected": false }
+  ]
+}

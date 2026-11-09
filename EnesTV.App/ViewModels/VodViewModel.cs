@@ -151,7 +151,7 @@ public sealed class VodViewModel : Observable, IAsyncDisposable
         {
             if (delay) await Task.Delay(180, ct);
             var all = _all; var search = Search.Trim(); var category = Category;
-            var result = await Task.Run(() => all.Where(x => (category == "Tüm kategoriler" || x.Category == category) && (search.Length == 0 || x.Name.Contains(search, StringComparison.OrdinalIgnoreCase))).ToArray(), ct);
+            var result = await Task.Run(() => all.Where(x => (category == "Tüm kategoriler" || x.Category == category) && TextSearch.Contains(x.Name, search)).ToArray(), ct);
             ct.ThrowIfCancellationRequested(); Items = result;
         }
         catch (OperationCanceledException) { }

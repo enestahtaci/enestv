@@ -111,6 +111,19 @@ Fixture'lar: `xmltv/times.json`, `xmltv/guide.xml`.
 geçersizse, bitiş ≤ başlangıçsa, bitiş **şimdi − 1 gün**den önceyse, başlangıç **şimdi + 8 gün**den sonraysa.
 Başlık yoksa `İsimsiz program`, açıklama yoksa boş. Eşleştirme kanalın `tvgId` değeriyle yapılır.
 
+## 4a. Arama (`search/cases.json`)
+
+- Bir metin, sorgunun baştaki/sondaki boşlukları atılmış hâlini **alt metin** olarak içeriyorsa eşleşir; boş sorgu
+  her şeyle eşleşir.
+- Büyük/küçük harf duyarsızdır ve **Türkçe i harflerini tek harf sayar**: `I`, `ı`, `İ`, `i` birbirinin yerine geçer.
+  Diğer karakterler kültürden bağımsız küçük harfleriyle karşılaştırılır (`Ç/ç`, `Ş/ş`, `Ğ/ğ`, `Ö/ö`, `Ü/ü` eşleşir).
+  Böylece hem `şimdi` → `ŞİMDİ TV` hem `bein` → `BEIN SPORTS` bulunur. (Kültüre göre küçültme kullanılmaz; tr-TR
+  `BEIN`'i `beın` yapar ve İngilizce adları bozar.)
+- Aksanlar kaldırılmaz: `cocuk` ≠ `çocuk`, `seker` ≠ `şeker`.
+- Tam eşitlik (ör. favori listesi adının benzersizliği) aynı harf eşlemesiyle yapılır.
+- Kod: `TextSearch.Contains` / `TextSearch.Equals`. Kanal listesi, film/dizi kataloğu, TV rehberi ve Kanal düzeni
+  aramaları bunu kullanır.
+
 ## 5. Ağ
 
 - Yalnızca `http`/`https`. En fazla 8 yönlendirme, sıkıştırma (gzip/deflate/brotli) açık, bağlantı zaman aşımı 12 sn,
@@ -145,17 +158,15 @@ Bunlar Windows uygulamasında (`EnesTV.App`) uygulanıyor; mobil/TV çekirdeğin
 - **Numarayla geçiş:** En fazla 6 hane; son tuştan 1,2 sn sonra veya Enter ile geçilir; Geri (Backspace) son haneyi siler,
   Esc iptal eder; pencere odağını kaybedince de iptal edilir.
 - **Önceki/sonraki kanal:** Görünen listede döngüsel. **Son kanal:** bir önceki farklı kanal.
-- **Arama:** Kanal adı (özel ad dahil) veya kategoride, baştaki/sondaki boşluk atılmış, büyük/küçük harf duyarsız alt metin.
+- **Arama:** Kanal adında (özel ad dahil) veya kategorisinde, 4a'daki kurala göre. Kanal düzeninde orijinal ad da aranır.
 - **Aynı anda tek yayın:** Canlı TV ile film/dizi arasında geçerken diğeri durdurulur (sağlayıcı bağlantı sınırı).
 
 ## 9. Bilinen tuhaflıklar ve hatalar
 
 Fixture'lar şu anki davranışı kaydeder. Düzeltilirse ilgili fixture ve bu bölüm güncellenir.
 
-1. **Türkçe büyük/küçük harf araması (hata).** Arama `OrdinalIgnoreCase` kullanır; bu karşılaştırma Türkçe İ/i ve
-   I/ı eşlemelerini bilmez. .NET 10'da doğrulandı: `"ŞİMDİ TV"` içinde `"şimdi"`, `"İSTANBUL"` içinde `"istanbul"`
-   ve `"ISPARTA"` içinde `"ısparta"` **bulunmuyor**; `"Çocuk"`/`"ÇOCUK"` bulunuyor. (`ChannelFilter.Matches`,
-   `MainViewModel` filtresi.) Mobil sürümlerde bu hata taşınmamalı; Windows'ta da düzeltilmesi önerilir.
+1. ~~Türkçe büyük/küçük harf araması~~ — **düzeltildi.** Önceden arama `OrdinalIgnoreCase` kullanıyordu ve
+   `"şimdi"` `"ŞİMDİ TV"`yi bulamıyordu. Kural artık 4a'da; diğer platformlar doğrudan yeni kuralı uygular.
 2. **Kapanmamış tırnak (tuhaflık).** `#EXTINF:garbage tvg-name="Broken` satırında ad bulunamaz ve `tvg-name` değeri
    tırnakla birlikte okunur: kanal adı `"Broken` olur (`malformed-extinf`). Sonraki kanallar etkilenmez.
 3. **İç içe dizi biçiminde bölüm numarası (tuhaflık).** `episode_num` yoksa numara sezon içindeki sıra değil,

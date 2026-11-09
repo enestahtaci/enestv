@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using EnesTV.App.ViewModels;
 using EnesTV.Core.Models;
+using TextSearch = EnesTV.Core.Services.TextSearch; // not WPF's System.Windows.Controls.TextSearch
 
 namespace EnesTV.App.Views;
 
@@ -39,7 +40,7 @@ public partial class OrganizationWindow : Window
         _lists = new(vm.Layout.FavoriteLists.Select(x => x with { Channels = new(x.Channels) }));
         _categories = vm.AllChannels.Select(x => x.Category).Distinct().Order().Select(x => new CategoryRow(x, !vm.Layout.HiddenCategories.Contains(x))).ToArray();
         _view = CollectionViewSource.GetDefaultView(_rows);
-        _view.Filter = item => item is ChannelRow row && (string.IsNullOrWhiteSpace(Search.Text) || row.Name.Contains(Search.Text.Trim(), StringComparison.OrdinalIgnoreCase) || row.Category.Contains(Search.Text.Trim(), StringComparison.OrdinalIgnoreCase) || row.OriginalName.Contains(Search.Text.Trim(), StringComparison.OrdinalIgnoreCase));
+        _view.Filter = item => item is ChannelRow row && (TextSearch.Contains(row.Name, Search.Text) || TextSearch.Contains(row.Category, Search.Text) || TextSearch.Contains(row.OriginalName, Search.Text));
         RowsGrid.ItemsSource = _view; CategoryList.ItemsSource = _categories; Lists.ItemsSource = _lists; Lists.SelectedIndex = 0;
         Closing += (_, e) => { if (_saving) e.Cancel = true; };
     }
@@ -74,7 +75,7 @@ public partial class OrganizationWindow : Window
     }
     private bool UniqueName(string name, string? id = null)
     {
-        if (_lists.Any(x => x.Id != id && x.Name.Equals(name, StringComparison.OrdinalIgnoreCase))) { Result.Text = "Bu isimde bir liste zaten var."; return false; }
+        if (_lists.Any(x => x.Id != id && TextSearch.Equals(x.Name, name))) { Result.Text = "Bu isimde bir liste zaten var."; return false; }
         return true;
     }
     private void NewList_Click(object sender, RoutedEventArgs e)

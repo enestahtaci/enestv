@@ -154,7 +154,7 @@ public sealed partial class MainViewModel : Observable, IAsyncDisposable
             {
                 IEnumerable<ChannelItem> filtered = all.Where(x => !x.Hidden && !layout.HiddenCategories.Contains(x.Category) &&
                     (category == "Tüm kategoriler" || x.Category == category) &&
-                    (string.IsNullOrWhiteSpace(query) || x.Name.Contains(query.Trim(), StringComparison.OrdinalIgnoreCase) || x.Category.Contains(query.Trim(), StringComparison.OrdinalIgnoreCase)))
+                    (TextSearch.Contains(x.Name, query) || TextSearch.Contains(x.Category, query)))
                     .OrderBy(x => x.SortOrder);
                 if (section == "Favorites") filtered = favoriteList == null ? filtered.Where(x => x.Favorite) : filtered.Where(x => favoriteList.Channels.Contains(x.Channel.Id));
                 if (section == "Recent") { var rank = recent.Select((id, i) => (id, i)).ToDictionary(x => x.id, x => x.i); filtered = filtered.Where(x => rank.ContainsKey(x.Channel.Id)).OrderBy(x => rank[x.Channel.Id]); }

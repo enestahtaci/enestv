@@ -79,6 +79,20 @@ public sealed class FixtureTests
             c.GetProperty("id").GetString()!, c.GetProperty("extension").GetString()!, c.GetProperty("episode").GetBoolean()));
         Same(Expected("xtream/stream-urls.expected.json"), urls);
     }
+    [Fact] public void TurkishAwareSearch()
+    {
+        var cases = Doc("search/cases.json");
+        foreach (var c in cases.GetProperty("contains").EnumerateArray())
+        {
+            var (text, query) = (c.GetProperty("text").GetString()!, c.GetProperty("query").GetString()!);
+            Assert.True(c.GetProperty("expected").GetBoolean() == TextSearch.Contains(text, query), $"Contains(\"{text}\", \"{query}\")");
+        }
+        foreach (var c in cases.GetProperty("equals").EnumerateArray())
+        {
+            var (a, b) = (c.GetProperty("a").GetString()!, c.GetProperty("b").GetString()!);
+            Assert.True(c.GetProperty("expected").GetBoolean() == TextSearch.Equals(a, b), $"Equals(\"{a}\", \"{b}\")");
+        }
+    }
     [Fact] public void XmlTvTimes()
     {
         var cases = Doc("xmltv/times.json");
