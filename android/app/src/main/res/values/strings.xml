@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">enestv</string>
     <string name="channels_title">Kanallar</string>
+    <string name="search_hint">Kanal ara</string>
 </resources>

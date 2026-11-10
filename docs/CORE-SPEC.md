@@ -23,7 +23,8 @@ kullanıcı verisi kopar.
 
 ## 2. M3U
 
-Fixture'lar: `m3u/metadata-commas-duplicates`, `m3u/malformed-extinf`, `m3u/features`, `m3u/windows-1254`.
+Fixture'lar: `m3u/metadata-commas-duplicates`, `m3u/malformed-extinf`, `m3u/features`, `m3u/windows-1254`,
+`m3u/urls.json`.
 
 **Satırlar.** Her satırın başındaki/sonundaki boşluk ve BOM (`U+FEFF`) atılır; boş satırlar atlanır.
 
@@ -39,6 +40,21 @@ Fixture'lar: `m3u/metadata-commas-duplicates`, `m3u/malformed-extinf`, `m3u/feat
 **Adres satırı.** Mutlak URL ya da (taban adres varsa) ona göre göreli URL. İzin verilen şemalar:
 `http`, `https`, `rtsp`, `rtmp`, `udp`, `rtp`, `file`. Başka şema veya geçersiz adres kanalı oluşturmaz.
 Her adres satırından sonra (kanal eklensin ya da eklenmesin) ad ve öznitelikler sıfırlanır.
+
+**Adres normalleştirme** (`m3u/urls.json`). Kanal adresi ve logo, .NET `Uri.AbsoluteUri` (Windows) biçimine çevrilir;
+kanal anahtarı bu adresten üretildiği için diğer platformlar bunu birebir uygular (Java `URI` farklı davranır):
+- Mutlak adres `şema://` ile başlamalı (`http:/x`, `http:x` geçersiz). Şema ve ana makine küçük harfe çevrilir
+  (ana makinede noktalı `İ` olduğu gibi kalır; Unicode ana makine adı Punycode'a çevrilmez). Ana makine boşsa
+  geçersizdir (`file` hariç).
+- Varsayılan port atılır (`http` 80, `https` 443, `ftp` 21); `:0080` → 80, boş port atılır. Diğer şemalarda port kalır.
+- Yol boşsa `/` olur (`rtp://h` → `rtp://h/`); `.` ve `..` bölümleri çözülür, `//` korunur. Sorgu/parça öncesindeki
+  `\` → `/`.
+- Yüzde kodları: ayrılmamış ASCII karaktere karşılık gelenler çözülür (`%7E` → `~`, `%41` → `A`); diğer ASCII kodları
+  yazıldığı gibi kalır (`%2f` küçük harfle kalır); ASCII dışı baytların kodu büyük harfe çevrilir; geçersiz `%` → `%25`.
+- Kodlanan karakterler: boşluk, kontrol karakterleri, `"` `<` `>` `\` `^` `` ` `` `{` `|` `}` ve ASCII dışı her
+  karakter (UTF-8 baytları, büyük harf onaltılık). `[` `]` `'` `!` `$` `&` `(` `)` `*` `+` `,` `;` `=` `:` `@` `/` `?`
+  olduğu gibi kalır. Boş sorgu (`?`) ve boş parça (`#`) korunur.
+- Göreli adres taban adrese RFC 3986'ya göre bağlanır, sonra aynı normalleştirme uygulanır.
 
 **Kanal alanları:**
 - Ad: `#EXTINF` adı → yoksa `tvg-name` → yoksa `İsimsiz kanal`.

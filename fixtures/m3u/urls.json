@@ -1,0 +1,276 @@
+{
+  "description": "Absolute URL normalization (AbsoluteUri of .NET Uri on Windows) used for M3U channel URLs and logos; channel keys depend on it. null = not an absolute URL.",
+  "absolute": [
+    {
+      "input": "http://example.invalid/a.ts",
+      "expected": "http://example.invalid/a.ts"
+    },
+    {
+      "input": "HTTP://Example.INVALID:80/a b/ç.ts",
+      "expected": "http://example.invalid/a%20b/%C3%A7.ts"
+    },
+    {
+      "input": "HTTPS://EXAMPLE.invalid:443",
+      "expected": "https://example.invalid/"
+    },
+    {
+      "input": "http://h:8080/x",
+      "expected": "http://h:8080/x"
+    },
+    {
+      "input": "http://h:0080/x",
+      "expected": "http://h/x"
+    },
+    {
+      "input": "http://h:/x",
+      "expected": "http://h/x"
+    },
+    {
+      "input": "rtsp://h:554/s",
+      "expected": "rtsp://h:554/s"
+    },
+    {
+      "input": "rtmp://H/Live",
+      "expected": "rtmp://h/Live"
+    },
+    {
+      "input": "udp://@239.0.0.1:1234",
+      "expected": "udp://@239.0.0.1:1234/"
+    },
+    {
+      "input": "udp://h:1234",
+      "expected": "udp://h:1234/"
+    },
+    {
+      "input": "rtp://h",
+      "expected": "rtp://h/"
+    },
+    {
+      "input": "file:///C:/lists/a.ts",
+      "expected": "file:///C:/lists/a.ts"
+    },
+    {
+      "input": "http://[::1]:8080/x",
+      "expected": "http://[::1]:8080/x"
+    },
+    {
+      "input": "http://h/a/../b/./c.ts",
+      "expected": "http://h/b/c.ts"
+    },
+    {
+      "input": "http://h/x/..",
+      "expected": "http://h/"
+    },
+    {
+      "input": "http://h/x/.",
+      "expected": "http://h/x/"
+    },
+    {
+      "input": "http://h/../x",
+      "expected": "http://h/x"
+    },
+    {
+      "input": "http://h//double//slash",
+      "expected": "http://h//double//slash"
+    },
+    {
+      "input": "http://h/live/u/pa%20ss/1.ts",
+      "expected": "http://h/live/u/pa%20ss/1.ts"
+    },
+    {
+      "input": "http://h/%7Euser/%2F",
+      "expected": "http://h/~user/%2F"
+    },
+    {
+      "input": "http://h/a%2fb%2Fc",
+      "expected": "http://h/a%2fb%2Fc"
+    },
+    {
+      "input": "http://h/%41%42",
+      "expected": "http://h/AB"
+    },
+    {
+      "input": "http://h/a%c3%a7.ts",
+      "expected": "http://h/a%C3%A7.ts"
+    },
+    {
+      "input": "http://h/%e2%82%ac",
+      "expected": "http://h/%E2%82%AC"
+    },
+    {
+      "input": "http://h/100%",
+      "expected": "http://h/100%25"
+    },
+    {
+      "input": "http://h/a%zzb",
+      "expected": "http://h/a%25zzb"
+    },
+    {
+      "input": "http://h/p[1]x",
+      "expected": "http://h/p[1]x"
+    },
+    {
+      "input": "http://h/q'!$&()*+,;=:@",
+      "expected": "http://h/q'!$&()*+,;=:@"
+    },
+    {
+      "input": "http://h/<x>.ts",
+      "expected": "http://h/%3Cx%3E.ts"
+    },
+    {
+      "input": "http://h/{x}|^`.ts",
+      "expected": "http://h/%7Bx%7D%7C%5E%60.ts"
+    },
+    {
+      "input": "http://h/a\"b.ts",
+      "expected": "http://h/a%22b.ts"
+    },
+    {
+      "input": "http://h/a\\b.ts",
+      "expected": "http://h/a/b.ts"
+    },
+    {
+      "input": "http://h/\t/x",
+      "expected": "http://h/%09/x"
+    },
+    {
+      "input": "http://h/ü?ü#ü",
+      "expected": "http://h/%C3%BC?%C3%BC#%C3%BC"
+    },
+    {
+      "input": "http://h/path?token=a b&x=ç",
+      "expected": "http://h/path?token=a%20b&x=%C3%A7"
+    },
+    {
+      "input": "http://h/p?q=/?:@[]'!$&()*+,;=<>\"{}|^`\\",
+      "expected": "http://h/p?q=/?:@[]'!$&()*+,;=%3C%3E%22%7B%7D%7C%5E%60%5C"
+    },
+    {
+      "input": "http://h/p?q=%7e%2f%3d",
+      "expected": "http://h/p?q=~%2f%3d"
+    },
+    {
+      "input": "http://h/q?a=%41",
+      "expected": "http://h/q?a=A"
+    },
+    {
+      "input": "http://h/x?",
+      "expected": "http://h/x?"
+    },
+    {
+      "input": "http://h/a?b?c",
+      "expected": "http://h/a?b?c"
+    },
+    {
+      "input": "http://h/a.ts#frag",
+      "expected": "http://h/a.ts#frag"
+    },
+    {
+      "input": "http://h/p#f g<>ç%7e",
+      "expected": "http://h/p#f%20g%3C%3E%C3%A7~"
+    },
+    {
+      "input": "http://h/p?a=1#",
+      "expected": "http://h/p?a=1#"
+    },
+    {
+      "input": "http://h?x",
+      "expected": "http://h/?x"
+    },
+    {
+      "input": "http://h#x",
+      "expected": "http://h/#x"
+    },
+    {
+      "input": "http://user:pa@h/x",
+      "expected": "http://user:pa@h/x"
+    },
+    {
+      "input": "http://us%65r:p%40ss@h/x",
+      "expected": "http://user:p%40ss@h/x"
+    },
+    {
+      "input": "http://ışık.example/x",
+      "expected": "http://ışık.example/x"
+    },
+    {
+      "input": "http://ŞİMDİ.TV/x",
+      "expected": "http://şİmdİ.tv/x"
+    },
+    {
+      "input": "ftp://example.invalid/d",
+      "expected": "ftp://example.invalid/d"
+    },
+    {
+      "input": "relative/b.m3u8",
+      "expected": null
+    },
+    {
+      "input": "/abs.ts",
+      "expected": null
+    },
+    {
+      "input": "not a url",
+      "expected": null
+    },
+    {
+      "input": "udp://@:1234",
+      "expected": null
+    },
+    {
+      "input": "http:/h/x",
+      "expected": null
+    },
+    {
+      "input": "http:h/x",
+      "expected": null
+    }
+  ],
+  "baseUri": "https://example.invalid/lists/main.m3u",
+  "relative": [
+    {
+      "input": "../x.ts",
+      "expected": "https://example.invalid/x.ts"
+    },
+    {
+      "input": "/abs.ts",
+      "expected": "https://example.invalid/abs.ts"
+    },
+    {
+      "input": "x y.ts",
+      "expected": "https://example.invalid/lists/x%20y.ts"
+    },
+    {
+      "input": "?q=1",
+      "expected": "https://example.invalid/lists/main.m3u?q=1"
+    },
+    {
+      "input": "//cdn.example/x.ts",
+      "expected": "https://cdn.example/x.ts"
+    },
+    {
+      "input": "logo.png",
+      "expected": "https://example.invalid/lists/logo.png"
+    },
+    {
+      "input": "./a/../b.ts",
+      "expected": "https://example.invalid/lists/b.ts"
+    },
+    {
+      "input": "çiçek.png",
+      "expected": "https://example.invalid/lists/%C3%A7i%C3%A7ek.png"
+    },
+    {
+      "input": "#f",
+      "expected": "https://example.invalid/lists/main.m3u#f"
+    },
+    {
+      "input": "a%7eb.ts",
+      "expected": "https://example.invalid/lists/a~b.ts"
+    },
+    {
+      "input": "http://other.invalid/z",
+      "expected": "http://other.invalid/z"
+    }
+  ]
+}

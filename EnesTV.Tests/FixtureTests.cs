@@ -44,6 +44,17 @@ public sealed class FixtureTests
         var channels = await M3uParser.ParseFileAsync(P("m3u/windows-1254.m3u"), "tr", null, default);
         Same(expected["channels"], channels.Select(Ch));
     }
+    // Channel URLs (and so channel keys) are .NET Uri.AbsoluteUri; other platforms reimplement it. This also catches a
+    // .NET upgrade that changes Uri normalization, which would silently change channel keys.
+    [Fact] public void M3uUrlNormalization()
+    {
+        var doc = Doc("m3u/urls.json");
+        foreach (var c in doc.GetProperty("absolute").EnumerateArray())
+            Assert.Equal(c.GetProperty("expected").GetString(), Uri.TryCreate(c.GetProperty("input").GetString(), UriKind.Absolute, out var u) ? u.AbsoluteUri : null);
+        var baseUri = new Uri(doc.GetProperty("baseUri").GetString()!);
+        foreach (var c in doc.GetProperty("relative").EnumerateArray())
+            Assert.Equal(c.GetProperty("expected").GetString(), Uri.TryCreate(baseUri, c.GetProperty("input").GetString(), out var u) ? u.AbsoluteUri : null);
+    }
     [Fact] public void XtreamServerNormalization()
     {
         var cases = Doc("xtream/normalize-server.json");

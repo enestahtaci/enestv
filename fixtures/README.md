@@ -11,6 +11,7 @@ Dosyalar bayt bayt okunur (BOM, Windows-1254, LF). `.gitattributes` bu klasörde
 | Girdi | Beklenen çıktı | Nasıl çalıştırılır |
 | --- | --- | --- |
 | `m3u/*.m3u` | `m3u/*.expected.json` | `sourceId` ve `baseUri` beklenen dosyadadır. `windows-1254.m3u` dosya olarak açılır (UTF-8 hatasında 1254'e geri dönüş). |
+| `m3u/urls.json` | aynı dosya (`absolute`, `relative` + `baseUri`; `expected`) | Mutlak adres normalleştirme (.NET `Uri.AbsoluteUri`, Windows). `null`: mutlak adres değil. Kanal anahtarı bu adresten üretilir. |
 | `xtream/normalize-server.json` | aynı dosya (`valid` / `rejected`) | `rejected` girdileri kullanıcı hatası vermelidir. |
 | `xtream/account.json` + `live-categories.json` + `live-streams.json` | `xtream/live.expected.json` | Kaynak kimliği `acc`. |
 | `xtream/vod-categories.json` + `vod-streams.json` | `xtream/vod-catalog.expected.json` | Tür `Movie`, kaynak `acc`. |
