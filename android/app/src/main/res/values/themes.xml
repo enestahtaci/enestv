@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Same dark palette as the Windows app (EnesTV.App/Views/Theme.cs). -->
+    <color name="page">#101216</color>
+    <color name="panel">#191D24</color>
+    <color name="surface">#242A34</color>
+    <color name="text">#F3F5F7</color>
+    <color name="muted">#A3ADBC</color>
+    <color name="accent">#B3F36B</color>
+    <color name="accent_surface">#2C3B20</color>
+
+    <style name="Theme.Enestv" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/page</item>
+        <item name="android:colorBackground">@color/page</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+</resources>

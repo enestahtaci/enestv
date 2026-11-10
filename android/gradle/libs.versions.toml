@@ -1,0 +1,15 @@
+# All Android versions live here. Policy: newest stable release only (no alpha/beta/rc); JDK is an LTS.
+# Review once a year when Google Play raises the required targetSdk (see android/README.md).
+[versions]
+agp = "9.5.1"
+kotlin = "2.4.21"
+recyclerview = "1.4.0"
+junit = "4.13.2"
+
+[libraries]
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
