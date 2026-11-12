@@ -40,5 +40,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.recyclerview)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.hls)
     testImplementation(libs.junit)
 }

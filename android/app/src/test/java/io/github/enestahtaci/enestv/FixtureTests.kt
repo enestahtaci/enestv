@@ -1,11 +1,16 @@
 package io.github.enestahtaci.enestv
 
+import io.github.enestahtaci.enestv.core.BackupFile
 import io.github.enestahtaci.enestv.core.Channel
 import io.github.enestahtaci.enestv.core.FoldedIndex
+import io.github.enestahtaci.enestv.core.Json
 import io.github.enestahtaci.enestv.core.M3uParser
 import io.github.enestahtaci.enestv.core.TextSearch
 import io.github.enestahtaci.enestv.core.UrlNormalizer
+import io.github.enestahtaci.enestv.core.UserInputException
+import io.github.enestahtaci.enestv.core.Xtream
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
@@ -14,11 +19,18 @@ import java.io.File
 class FixtureTests {
     private val root = File(System.getProperty("enestv.fixtures") ?: "../../fixtures")
 
+    private fun read(path: String) = Json.parse(File(root, path).readText(Charsets.UTF_8))
+
     @Suppress("UNCHECKED_CAST")
-    private fun json(path: String) = MiniJson.parse(File(root, path).readText(Charsets.UTF_8)) as Map<String, Any?>
+    private fun json(path: String) = read(path) as Map<String, Any?>
 
     @Suppress("UNCHECKED_CAST")
     private fun Map<String, Any?>.list(key: String) = this[key] as List<Map<String, Any?>>
+
+    private fun channels(expected: Map<String, Any?>) = expected.list("channels").map {
+        Channel(it["id"] as String, it["sourceId"] as String, it["name"] as String, it["url"] as String,
+            it["tvgId"] as String, it["tvgName"] as String, it["logo"] as String, it["category"] as String)
+    }
 
     @Test
     fun searchCases() {
@@ -55,12 +67,56 @@ class FixtureTests {
         assertTrue(files.size >= 4)
         for (file in files) {
             val expected = json("m3u/${file.nameWithoutExtension}.expected.json")
-            val channels = M3uParser.parse({ file.inputStream() }, expected["sourceId"] as String, expected["baseUri"] as String?)
-            val want = expected.list("channels").map {
-                Channel(it["id"] as String, it["sourceId"] as String, it["name"] as String, it["url"] as String,
-                    it["tvgId"] as String, it["tvgName"] as String, it["logo"] as String, it["category"] as String)
-            }
-            assertEquals(file.name, want, channels)
+            val actual = M3uParser.parse({ file.inputStream() }, expected["sourceId"] as String, expected["baseUri"] as String?)
+            assertEquals(file.name, channels(expected), actual)
         }
+    }
+
+    @Test
+    fun xtreamServerNormalization() {
+        val cases = json("xtream/normalize-server.json")
+        for (c in cases.list("valid")) assertEquals(c["input"] as String, c["expected"], Xtream.normalizeServer(c["input"] as String))
+        for (input in cases["rejected"] as List<*>) assertThrows(input as String, UserInputException::class.java) { Xtream.normalizeServer(input) }
+    }
+
+    @Test
+    fun xtreamLiveStreams() {
+        val account = json("xtream/account.json")
+        val expected = json("xtream/live.expected.json")
+        val actual = Xtream.parseLiveStreams(expected["sourceId"] as String, account["server"] as String, account["username"] as String,
+            account["password"] as String, read("xtream/live-categories.json"), read("xtream/live-streams.json"))
+        assertEquals(channels(expected), actual)
+    }
+
+    // Cross-platform backup: the sample made by the Windows core must decrypt to exactly sample.expected.json.
+    @Test
+    fun backupSampleDecrypts() {
+        val file = File(root, "backup/sample.enestv").readBytes()
+        val payload = BackupFile.decrypt(file, "enestv-fixture-parola")
+        assertEquals(read("backup/sample.expected.json"), payload)
+        val xtream = BackupFile.sources(payload).first { it.kind == "Xtream" }
+        assertEquals("p&ss/ğüş", xtream.password)
+        // NFC: the same passphrase typed in decomposed form still opens the file.
+        val decomposed = java.text.Normalizer.normalize("enestv-fixture-parola", java.text.Normalizer.Form.NFD)
+        assertEquals(payload, BackupFile.decrypt(file, decomposed))
+        val wrong = assertThrows(UserInputException::class.java) { BackupFile.decrypt(file, "yanlış-parola-123") }
+        assertTrue(wrong.message!!.contains("Parola yanlış"))
+        assertThrows(UserInputException::class.java) { BackupFile.decrypt("{\"hello\":1}".toByteArray(), "enestv-fixture-parola") }
+    }
+
+    @Test
+    fun pbkdf2MatchesRfcVector() {
+        // RFC 7914 §11 PBKDF2-HMAC-SHA256 test vector (P="passwd", S="salt", c=1), first 32 bytes.
+        val key = BackupFile.pbkdf2Sha256("passwd".toByteArray(), "salt".toByteArray(), 1)
+        assertEquals("55ac046e56e3089fec1691c22544b605f94185216dde0465e68b9d57c20dacbc", key.joinToString("") { "%02x".format(it) })
+    }
+
+    @Test
+    fun xtreamAuthentication() {
+        assertTrue(Xtream.isAuthenticated(Json.parse("""{"user_info":{"auth":1,"status":"Active"}}""")))
+        assertTrue(Xtream.isAuthenticated(Json.parse("""{"user_info":{"auth":"1"}}""")))
+        assertTrue(!Xtream.isAuthenticated(Json.parse("""{"user_info":{"auth":0}}""")))
+        assertTrue(!Xtream.isAuthenticated(Json.parse("""{"user_info":{"auth":"1","status":"Expired"}}""")))
+        assertTrue(!Xtream.isAuthenticated(Json.parse("""[]""")))
     }
 }

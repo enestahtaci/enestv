@@ -3,4 +3,16 @@
     <string name="app_name">enestv</string>
     <string name="channels_title">Kanallar</string>
     <string name="search_hint">Kanal ara</string>
+    <string name="source_button">Kaynak</string>
+    <string name="source_title">Kaynak ekle</string>
+    <string name="source_note">Bilgiler yalnızca bu TV\'de, şifreli olarak saklanır.</string>
+    <string name="kind_m3u">M3U adresi</string>
+    <string name="kind_xtream">Xtream hesabı</string>
+    <string name="m3u_url_hint">M3U adresi (http://…)</string>
+    <string name="server_hint">Sunucu (ör. http://sunucu:8080)</string>
+    <string name="username_hint">Kullanıcı adı</string>
+    <string name="password_hint">Parola</string>
+    <string name="save">Kaydet ve yükle</string>
+    <string name="kind_backup">Yedekten</string>
+    <string name="backup_passphrase_hint">Yedek parolası</string>
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Most IPTV providers still serve playlists and streams over plain HTTP; the user chooses the source. -->
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
+<!-- Most IPTV providers still serve playlists and streams over plain HTTP; the user chooses the source.
+     The app shows the same HTTP warning as the Windows version (README: "HTTP kaynakları"). -->
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config cleartextTrafficPermitted="true" tools:ignore="InsecureBaseConfiguration" />
 </network-security-config>

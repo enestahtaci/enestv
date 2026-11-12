@@ -1,55 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 48dp/27dp overscan-safe margins as recommended for TV. -->
+<!-- Left: channel list (hidden in fullscreen). Right: the single video area. 48dp/27dp overscan-safe margins. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingStart="48dp"
-    android:paddingTop="27dp"
-    android:paddingEnd="48dp"
-    android:paddingBottom="27dp">
+    android:baselineAligned="false"
+    android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/title"
+    <LinearLayout
+        android:id="@+id/sidebar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/channels_title"
-        android:textColor="@color/text"
-        android:textSize="28sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="12dp"
-        android:textColor="@color/muted"
-        android:textSize="16sp" />
-
-    <EditText
-        android:id="@+id/search"
-        android:layout_width="480dp"
-        android:layout_height="56dp"
-        android:layout_marginBottom="12dp"
-        android:background="@drawable/channel_row_background"
-        android:hint="@string/search_hint"
-        android:imeOptions="actionSearch|flagNoExtractUi"
-        android:importantForAutofill="no"
-        android:inputType="text|textNoSuggestions"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textColor="@color/text"
-        android:textColorHint="@color/muted"
-        android:textSize="20sp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/channels"
-        android:layout_width="480dp"
         android:layout_height="match_parent"
-        android:background="@color/panel"
-        android:clipToPadding="false"
-        android:descendantFocusability="afterDescendants"
-        android:padding="8dp"
-        android:scrollbars="none" />
+        android:orientation="vertical"
+        android:paddingStart="48dp"
+        android:paddingTop="27dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="27dp">
+
+        <LinearLayout
+            android:layout_width="480dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/channels_title"
+                android:textColor="@color/text"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/sourceButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:background="@drawable/channel_row_background"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/source_button"
+                android:textColor="@color/text"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="480dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="12dp"
+            android:maxLines="2"
+            android:textColor="@color/muted"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/search"
+            android:layout_width="480dp"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/channel_row_background"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionSearch|flagNoExtractUi"
+            android:importantForAutofill="no"
+            android:inputType="text|textNoSuggestions"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/text"
+            android:textColorHint="@color/muted"
+            android:textSize="20sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/channels"
+            android:layout_width="480dp"
+            android:layout_height="match_parent"
+            android:background="@color/panel"
+            android:clipToPadding="false"
+            android:descendantFocusability="afterDescendants"
+            android:padding="8dp"
+            android:scrollbars="none" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/videoFrame"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/black">
+
+        <SurfaceView
+            android:id="@+id/video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/playerStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="24dp"
+            android:background="#B3101216"
+            android:padding="12dp"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            android:visibility="gone" />
+    </FrameLayout>
 </LinearLayout>
