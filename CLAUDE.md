@@ -20,6 +20,10 @@ Uygulama yayın, liste veya hesap içermez; kullanıcı kendi M3U/Xtream kaynağ
   - `Views/` — `Styles.xaml` + `Theme.cs` (koyu/açık renkler iki yerde: ikisini birlikte güncelle), `Icon.cs` (Lucide ikonları),
     `Hint.cs` (placeholder), `FullscreenWindow.cs`, diyalog pencereleri (Rehber, Kanal düzeni, Ayarlar, Kaynak, Kısayollar).
 - `EnesTV.Tests/` birim testleri · `EnesTV.Smoke/` gerçek VLC ve WPF ile entegrasyon/UI doğrulaması · `Installer/` Inno Setup.
+- `android/` — Android TV / Google TV uygulaması (Kotlin, Faz 1 sürüyor). `android/core` saf Kotlin/JVM çekirdek (CORE-SPEC
+  kuralları, `fixtures/` testleri); `android/app` arayüz (klasik View + RecyclerView), Media3 oynatıcı, Keystore, SQLite.
+  Ayrıntı ve hedefler: `android/README.md`.
+- `.github/workflows/ci.yml` — her push/PR'da Windows (build + test) ve Android (:core test, release build, lint).
 
 ## Komutlar
 .NET 10 SDK `C:\Program Files\dotnet\dotnet.exe`, Inno Setup `%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`.
@@ -36,6 +40,21 @@ powershell -ExecutionPolicy Bypass -File Installer\Build-Setup.ps1 -InnoCompiler
   controls" düşebilir. Hata mesajı imlecin altındaki programı yazar; başka bir uygulamaysa ortam kaynaklıdır, tekrar çalıştır.
 - Windows PowerShell 5.1'de `Build-Setup.ps1` için `-OutputDirectory` verilmeli (parametre varsayılanında `$PSScriptRoot` boş).
 - Setup çalışırken `dist\*.exe` kilitlidir; yeniden derlemeden önce açık sihirbaz kapatılmalı.
+
+Android (Android Studio'nun JDK'sı, SDK `%LOCALAPPDATA%\Android\Sdk`; `android/` klasöründe):
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+.\gradlew.bat :core:test :app:assembleRelease :app:lintRelease
+.\gradlew.bat :core:test -PgenerateFixtures=true        # fixtures/backup/sample-android.enestv'yi yeniden üretir
+```
+- Klasör adındaki "ı" yüzünden `gradle.properties`'te `android.overridePathCheck=true` var; bir araç yine takılırsa
+  `subst` ile ASCII sürücüden derle (`android/README.md`).
+- Test cihazı: kullanıcının TCL 55C755'i (Android 14, **yalnız 32-bit**, 2,4 GB RAM). Bağlantı kablosuz hata ayıklama ile:
+  kullanıcı eşleştirme kodunu verir → `adb pair`, sonra mDNS'teki `_adb-tls-connect` portuna `adb connect`.
+- TV'de uygulamayı çalıştırmak, kurmak ve tuş göndermek kullanıcı onayıyla; TV'de başka uygulama açıksa (ör. TCL TV)
+  kullanıcı izliyor olabilir, tuş göndermeyi durdur. İş bitince TV'yi önceki uygulamaya döndür.
+- TV logu çok hızlı dolar: ölçümü `adb logcat -T 1 -s enestv.perf:*` ile canlı topla.
+- Kaynak ekranlarının ekran görüntüleri hesap bilgisi gösterebilir: gerekmedikçe alma, alınca hemen sil, kullanıcıya gönderme.
 
 ## Çalışma düzeni
 1. **Salt okunur analiz** → rapor (Türkçe, dosya:satır kanıtlı, hipotezler açıkça işaretli).
@@ -78,11 +97,28 @@ powershell -ExecutionPolicy Bypass -File Installer\Build-Setup.ps1 -InnoCompiler
 - `TreatWarningsAsErrors=true` — uyarısız derleme zorunlu.
 
 ## Bilinen açık işler
-- Çok platform planı Faz 0 tamam: .NET 10 (0.1), platformdan bağımsız çekirdek (0.2), ortak test verileri ve davranış
-  belgesi (0.3), parolalı yedek (0.4, `BackupFile` + `LibraryStore.ExportAsync/ReplaceAllAsync`). Sıradaki: Android TV
-  deneme sürümü ve teknoloji kararı. Birim testleri `net10.0`'da `TestSecretProtector` ile çalışır.
+- Çok platform planı Faz 0 tamam (1.5.0). Android TV deneme sürümü tamam: Kotlin + View + Media3 seçildi (hedefler TCL'de
+  tuttu). Faz 1 sürüyor: F1.1 veri katmanı tamam (çekirdek modülü, akışla JSON, şifreli kanal dosyası + SQLite, çok
+  kaynak, iki yönlü yedek). Sıradaki F1.2 canlı TV arayüzü (sol menü, numarayla kanal, bilgi şeridi, ses/altyazı,
+  yeniden bağlanma, renkli tuş kısayolları), sonra EPG, film/dizi, QR ile giriş, ayarlar, yayın hazırlığı.
+- Windows birim testleri `net10.0`'da `TestSecretProtector` ile çalışır.
 - Yedek biçimi (`docs/CORE-SPEC.md` §6a) diğer platformlarla ortaktır: alanı veya şifreleme parametresini değiştirme;
   gerekirse `version` artırılır ve eski sürüm okunmaya devam eder.
+
+## Android kuralları
+- **Hız önce gelir:** hedefler `android/README.md` (soğuk açılış < 1,5 sn, 60 fps, arama < 50 ms, kanal geçişi < 1 sn,
+  bellek < 150 MB, APK < 10 MB). Her adımda TCL'de ölç; bir hedef bozulursa adım bitmiş sayılmaz.
+- **Sürüm politikası:** JDK LTS; diğer her şey en yeni **kararlı** sürüm (alpha/beta/rc yok), hepsi
+  `android/gradle/libs.versions.toml`'da. Kullanımdan kalkmış kütüphane yok (ExoPlayer 2, Leanback). Yılda bir targetSdk
+  güncellemesi (Google Play ağustos zorunluluğu).
+- **Bağımlılık eklememe:** Android'in kendi araçları ve kendi küçük kodumuz (JSON, PBKDF2, logo yok). Yeni paket = onay +
+  lisans kontrolü (GPL-3.0 uyumu) + ileride NOTICES satırı.
+- **Kanal logosu yok** (kullanıcı kararı); yayın bilgisi yazıyla gösterilir. Renkli kumanda tuşları (kırmızı/yeşil/sarı/
+  mavi) kullanıcının seçtiği işlevlere atanır; "belirli kanala git" dahil, kanal anahtarıyla saklanır.
+- UI thread'inde ağ/disk/SQLite yok; Keystore açılışta bir kez (`Crypto`). Loglarda URL, kullanıcı adı veya parola yok;
+  hata mesajında istisna mesajı gösterme (ağ hatası URL içerebilir).
+- Kumanda odağı: listede sabit kimlik (`setHasStableIds`), ekran açılınca odak işe yarar öğede; her yeni ekranı TV'de
+  kumandayla dene (emülatör odak hatalarını göstermedi).
 
 ## Çekirdek kuralları
 - Ayrıştırma/kimlik/EPG kuralları `docs/CORE-SPEC.md`'de; ölçülebilir hâli `fixtures/` (dilden bağımsız, `FixtureTests`).
