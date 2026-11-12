@@ -36,23 +36,39 @@ object Xtream {
         return Json.text(info, "auth") == "1" && (status.isEmpty() || status.equals("Active", ignoreCase = true))
     }
 
-    fun parseLiveStreams(sourceId: String, server: String, username: String, password: String, categories: Any?, streams: Any?): List<Channel> {
+    /**
+     * get_live_streams, read as a stream: only one item is held in memory at a time, so accounts with tens of thousands
+     * of channels stay small. [categories] is the (small) get_live_categories tree.
+     */
+    fun parseLiveStreams(sourceId: String, server: String, username: String, password: String, categories: Any?, streams: java.io.Reader): List<Channel> {
         val groups = HashMap<String, String>()
         (categories as? List<*>)?.forEach { groups[Json.text(it, "category_id")] = Json.text(it, "category_name") }
-        if (streams !is List<*>) throw UserInputException("Sunucu geçerli bir canlı kanal listesi döndürmedi.")
+        val json = JsonStream(streams)
+        if (json.peek() != '['.code) throw UserInputException("Sunucu geçerli bir canlı kanal listesi döndürmedi.")
         val base = "${normalizeServer(server)}/live/${escapeData(username)}/${escapeData(password)}/"
-        val list = ArrayList<Channel>(streams.size)
+        val list = ArrayList<Channel>()
         val seen = HashSet<String>()
-        for (item in streams) {
-            val id = Json.text(item, "stream_id")
-            if (id.isEmpty()) continue
-            val name = Json.text(item, "name").ifEmpty { "Kanal $id" }
-            val key = Channel.key(sourceId, id, name)
-            if (seen.add(key)) {
-                list.add(Channel(key, sourceId, name, "$base${escapeData(id)}.ts", Json.text(item, "epg_channel_id"), name,
-                    Json.text(item, "stream_icon"), groups[Json.text(item, "category_id")] ?: Channel.UNCATEGORIZED))
+        json.beginArray()
+        while (json.hasNext()) {
+            if (json.peek() != '{'.code) { json.skipValue(); continue }
+            var id = ""; var name = ""; var category = ""; var epg = ""; var icon = ""
+            json.beginObject()
+            while (json.hasNext()) {
+                when (json.nextName()) {
+                    "stream_id" -> id = json.nextText()
+                    "name" -> name = json.nextText()
+                    "category_id" -> category = json.nextText()
+                    "epg_channel_id" -> epg = json.nextText()
+                    "stream_icon" -> icon = json.nextText()
+                    else -> json.skipValue()
+                }
             }
+            if (id.isEmpty()) continue
+            if (name.isEmpty()) name = "Kanal $id"
+            val key = Channel.key(sourceId, id, name)
+            if (seen.add(key)) list.add(Channel(key, sourceId, name, "$base${escapeData(id)}.ts", epg, name, icon, groups[category] ?: Channel.UNCATEGORIZED))
         }
+        list.trimToSize()
         return list
     }
 

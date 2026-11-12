@@ -84,8 +84,43 @@ class FixtureTests {
         val account = json("xtream/account.json")
         val expected = json("xtream/live.expected.json")
         val actual = Xtream.parseLiveStreams(expected["sourceId"] as String, account["server"] as String, account["username"] as String,
-            account["password"] as String, read("xtream/live-categories.json"), read("xtream/live-streams.json"))
+            account["password"] as String, read("xtream/live-categories.json"), File(root, "xtream/live-streams.json").reader(Charsets.UTF_8))
         assertEquals(channels(expected), actual)
+    }
+
+    @Test
+    fun jsonStreamReadsTextLikeTheTreeReader() {
+        val text = """[ {"a":"x\"yç","n":-12.5e3,"t":true,"f":false,"z":null,"o":{"k":[1,{"d":2}]},"s":""}, 7, [] ]"""
+        val tree = (Json.parse(text) as List<*>)[0] as Map<*, *>
+        val stream = io.github.enestahtaci.enestv.core.JsonStream(java.io.StringReader(text))
+        stream.beginArray(); assertTrue(stream.hasNext()); stream.beginObject()
+        while (stream.hasNext()) { val name = stream.nextName(); assertEquals(name, Json.text(tree, name), stream.nextText()) }
+        assertTrue(stream.hasNext()); stream.skipValue(); assertTrue(stream.hasNext()); stream.skipValue()
+        assertTrue(!stream.hasNext())
+    }
+
+    // Large account: 30,000 channels (≈ 10 MB of JSON) through the streaming parser.
+    @Test
+    fun xtreamLargeAccountStreams() {
+        val file = File.createTempFile("streams", ".json")
+        try {
+            file.bufferedWriter().use { w ->
+                w.write("[")
+                for (i in 1..30_000) {
+                    if (i > 1) w.write(",")
+                    w.write("""{"num":$i,"name":"Kanal Ünlü $i HD","stream_type":"live","stream_id":$i,"stream_icon":"http://logo.example.invalid/$i.png","epg_channel_id":"k$i.tr","added":"1700000000","category_id":"${i % 40}","custom_sid":"","tv_archive":0,"direct_source":"","tv_archive_duration":0}""")
+                }
+                w.write("]")
+            }
+            val t0 = System.nanoTime()
+            val channels = Xtream.parseLiveStreams("acc", "http://example.invalid", "u", "p", null, file.reader(Charsets.UTF_8))
+            val ms = (System.nanoTime() - t0) / 1_000_000
+            println("30k channels (${file.length() / 1024} KB) parsed in $ms ms")
+            assertEquals(30_000, channels.size)
+            assertEquals("http://example.invalid/live/u/p/30000.ts", channels.last().url)
+        } finally {
+            file.delete()
+        }
     }
 
     // Cross-platform backup: the sample made by the Windows core must decrypt to exactly sample.expected.json.

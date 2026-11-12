@@ -3,6 +3,7 @@ package io.github.enestahtaci.enestv.data
 import io.github.enestahtaci.enestv.core.AuthenticationException
 import io.github.enestahtaci.enestv.core.Channel
 import io.github.enestahtaci.enestv.core.Json
+import io.github.enestahtaci.enestv.core.JsonStream
 import io.github.enestahtaci.enestv.core.M3uParser
 import io.github.enestahtaci.enestv.core.UrlNormalizer
 import io.github.enestahtaci.enestv.core.UserInputException
@@ -51,8 +52,16 @@ class ChannelLibrary(private val dir: File) {
 
     private fun parseM3u(source: Source) = M3uParser.parse({ playlist.inputStream() }, source.id, UrlNormalizer.absolute(source.location.trim()))
 
-    private fun parseXtream(source: Source) =
-        Xtream.parseLiveStreams(source.id, source.location, source.username, source.password, readJson(categories), readJson(streams))
+    private fun parseXtream(source: Source): List<Channel> {
+        // A JSON object instead of the stream array is an error response (e.g. user_info.auth = 0); it is small.
+        if (streams.reader(Charsets.UTF_8).use { JsonStream(it).peek() } == '{'.code) {
+            readJson(streams)
+            throw UserInputException("Sunucu geçerli bir canlı kanal listesi döndürmedi.")
+        }
+        return streams.reader(Charsets.UTF_8).use {
+            Xtream.parseLiveStreams(source.id, source.location, source.username, source.password, readJson(categories), it)
+        }
+    }
 
     private fun readJson(file: File): Any? {
         val value = try {

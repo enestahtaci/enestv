@@ -14,4 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "enestv"
-include(":app")
+include(":core", ":app")

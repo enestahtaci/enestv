@@ -28,19 +28,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
-    testOptions {
-        unitTests.all {
-            // Shared, language-neutral test data at the repository root (fixtures/README.md).
-            it.systemProperty("enestv.fixtures", rootProject.file("../fixtures").absolutePath)
-            it.inputs.dir(rootProject.file("../fixtures"))
-        }
-    }
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(libs.androidx.recyclerview)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.exoplayer.hls)
-    testImplementation(libs.junit)
 }

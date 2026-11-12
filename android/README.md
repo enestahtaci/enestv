@@ -32,8 +32,11 @@ Requires Android Studio (bundled JDK) and the Android SDK. From this folder, in 
 
 ```powershell
 $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
-.\gradlew.bat :app:testDebugUnitTest :app:assembleDebug :app:assembleRelease
+.\gradlew.bat :core:test :app:assembleRelease :app:lintRelease
 ```
+
+Modules: `:core` is plain Kotlin/JVM (CORE-SPEC rules, fixture tests, no Android APIs); `:app` is the TV app
+(UI, playback, Keystore, storage).
 
 `local.properties` (ignored by git) holds `sdk.dir`. The repository folder name contains a non-ASCII letter, so
 `gradle.properties` sets `android.overridePathCheck=true`. If a build tool fails on the path, map an ASCII drive
