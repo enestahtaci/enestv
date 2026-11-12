@@ -6,11 +6,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import io.github.enestahtaci.enestv.core.AuthenticationException
+import io.github.enestahtaci.enestv.core.BackupFile
 import io.github.enestahtaci.enestv.core.UserInputException
 import io.github.enestahtaci.enestv.data.Library
 import io.github.enestahtaci.enestv.data.Source
@@ -35,7 +38,39 @@ class SourcesActivity : Activity() {
         findViewById<View>(R.id.add).setOnClickListener {
             @Suppress("DEPRECATION") startActivityForResult(Intent(this, SourceActivity::class.java), REQUEST_ADD)
         }
+        findViewById<View>(R.id.export).setOnClickListener { if (!busy) askBackupPassphrase() }
         reload()
+    }
+
+    /** Backup passphrase entered twice (CORE-SPEC §6a: always encrypted, at least 8 characters). */
+    private fun askBackupPassphrase() {
+        val first = EditText(this).apply { hint = "Yedek parolası (en az 8 karakter)"; inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD }
+        val second = EditText(this).apply { hint = "Parolayı tekrar girin"; inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD }
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(48, 16, 48, 0); addView(first); addView(second) }
+        AlertDialog.Builder(this)
+            .setTitle("Yedek al")
+            .setMessage("Yedek, hesap bilgileri dahil tüm kütüphaneyi içerir ve bu parolayla şifrelenir. Parolayı unutursanız yedek açılamaz.")
+            .setView(box)
+            .setPositiveButton("Yedekle") { _, _ ->
+                val pass = first.text.toString()
+                when {
+                    pass != second.text.toString() -> status.text = "Parolalar aynı değil."
+                    else -> exportBackup(pass)
+                }
+            }
+            .setNegativeButton("Vazgeç", null)
+            .show()
+    }
+
+    private fun exportBackup(passphrase: String) = run("Yedek hazırlanıyor…") {
+        BackupFile.checkPassphrase(passphrase)
+        val payload = Library.get(this).exportPayload(BuildConfigVersion.name(this))
+        val stamp = java.text.SimpleDateFormat("yyyy-MM-dd-HHmm", Locale.ROOT).format(Date())
+        val file = java.io.File(getExternalFilesDir(null), "enestv-yedek-$stamp.enestv")
+        val tmp = java.io.File(file.path + ".tmp")
+        tmp.writeBytes(BackupFile.encrypt(payload, passphrase))
+        tmp.renameTo(file)
+        "Yedek kaydedildi: ${file.name} (${(payload["channels"] as List<*>).size} kanal)."
     }
 
     @Deprecated("platform Activity API")

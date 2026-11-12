@@ -17,5 +17,6 @@
     <string name="source_name_hint">Kaynak adı (isteğe bağlı)</string>
     <string name="sources_title">Kaynaklar</string>
     <string name="add_source">Kaynak ekle</string>
+    <string name="export_backup">Yedek al</string>
     <string name="backup_passphrase_hint">Yedek parolası</string>
 </resources>

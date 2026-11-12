@@ -1,6 +1,7 @@
 package io.github.enestahtaci.enestv
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -53,12 +54,17 @@ class SourceActivity : Activity() {
             visible(backupInfo, m == Mode.BACKUP)
             backupInfo.text = if (backupFile.isFile) "Yedek dosyası hazır. Yedek parolasını girin." else "TV'de yedek dosyası bulunamadı ($BACKUP_NAME)."
             visible(error, false)
+            // Down from the choice row goes to the first field of this mode. Without this, Android's focus search
+            // skipped the passphrase field and landed on the save button (seen on the TCL TV).
+            val firstField = if (m == Mode.BACKUP) backupPassphrase else name
+            choices.values.forEach { it.nextFocusDownId = firstField.id }
         }
         fun showError(message: String?) { error.text = message; visible(error, true) }
 
         showMode(if (backupFile.isFile) Mode.BACKUP else Mode.M3U)
         choices.forEach { (k, v) -> v.setOnClickListener { showMode(k) } }
-        choices.getValue(mode).requestFocus()
+        // A backup waiting on the TV only needs its passphrase: start there.
+        (if (mode == Mode.BACKUP && backupFile.isFile) backupPassphrase else choices.getValue(mode)).requestFocus()
 
         findViewById<View>(R.id.save).setOnClickListener {
             if (busy) return@setOnClickListener
@@ -80,7 +86,14 @@ class SourceActivity : Activity() {
                         if (!backupFile.isFile) throw UserInputException("TV'de yedek dosyası bulunamadı.")
                         val passphrase = backupPassphrase.text.toString()
                         backupInfo.text = "Yedek açılıyor…"
-                        ({ importBackup(backupFile, passphrase) })
+                        busy = true
+                        visible(error, false)
+                        openBackup(backupFile, passphrase) { e ->
+                            busy = false
+                            backupInfo.text = "Yedek dosyası hazır. Yedek parolasını girin."
+                            if (e != null) showError(if (e is UserInputException) e.message else "Yedek açılamadı.")
+                        }
+                        return@setOnClickListener
                     }
                 }
                 busy = true
@@ -101,20 +114,42 @@ class SourceActivity : Activity() {
         }
     }
 
-    /** Adds every supported source of the backup with its original id, so channel keys (favorites) stay the same. */
-    private fun importBackup(file: File, passphrase: String) {
-        // Key derivation (600,000 PBKDF2 rounds) takes seconds on a TV: this runs on a background thread.
-        val t0 = SystemClock.elapsedRealtime()
-        val payload = BackupFile.decrypt(file.readBytes(), passphrase)
-        Log.i(Library.TAG, "backup decrypted in ${SystemClock.elapsedRealtime() - t0}ms")
-        val sources = BackupFile.sources(payload).mapNotNull { s ->
-            val kind = Source.Kind.fromBackup(s.kind) ?: return@mapNotNull null
-            Source(s.id, s.name, kind, if (kind == Source.Kind.XTREAM) Xtream.normalizeServer(s.location) else s.location, s.username, s.password)
+    /**
+     * Decrypts the backup, shows what it contains and, after confirmation, replaces the whole library with it
+     * (CORE-SPEC §6a; a safety copy is taken first). [done] gets null on success/cancel, or the error.
+     */
+    private fun openBackup(file: File, passphrase: String, done: (Throwable?) -> Unit) {
+        thread(name = "backup") {
+            val result = runCatching {
+                // Key derivation (600,000 PBKDF2 rounds) takes seconds on a TV: keep it off the UI thread.
+                val t0 = SystemClock.elapsedRealtime()
+                val payload = BackupFile.decrypt(file.readBytes(), passphrase)
+                Log.i(Library.TAG, "backup decrypted in ${SystemClock.elapsedRealtime() - t0}ms")
+                val summary = Library.get(this).summarize(payload)
+                if (summary.sources == 0) throw UserInputException("Yedekte bu sürümün açabileceği bir kaynak yok (Xtream veya M3U adresi).")
+                payload to summary
+            }
+            main.post {
+                result.onFailure { done(it) }.onSuccess { (payload, summary) ->
+                    val skipped = if (summary.skippedSources > 0) "\n${summary.skippedSources} yerel dosya kaynağı bu sürümde açılamadığı için atlanacak." else ""
+                    AlertDialog.Builder(this)
+                        .setTitle("Yedek yüklensin mi?")
+                        .setMessage("Yedekte ${summary.sources} kaynak, ${summary.channels} kanal ve ${summary.favorites} favori var.$skipped\n\n" +
+                            "Bu TV'deki kaynaklar, favoriler, son izlenenler, ayarlar ve kanal düzeni yedektekiyle değiştirilecek. Önce bu TV'de bir güvenlik kopyası alınır.")
+                        .setPositiveButton("Değiştir") { _, _ ->
+                            thread(name = "restore") {
+                                val restored = runCatching { Library.get(this).restore(payload); file.delete() }
+                                main.post {
+                                    restored.onSuccess { setResult(RESULT_OK); finish() }.onFailure { done(it) }
+                                }
+                            }
+                        }
+                        .setNegativeButton("Vazgeç") { _, _ -> done(null) }
+                        .setOnCancelListener { done(null) }
+                        .show()
+                }
+            }
         }
-        if (sources.isEmpty()) throw UserInputException("Yedekte bu sürümün açabileceği bir kaynak yok (Xtream veya M3U adresi).")
-        val library = Library.get(this)
-        sources.forEach(library::saveSource)
-        file.delete()
     }
 
     companion object {

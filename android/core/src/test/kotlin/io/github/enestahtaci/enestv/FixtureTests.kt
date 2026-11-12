@@ -147,7 +147,33 @@ class FixtureTests {
         assertEquals(payload, BackupFile.decrypt(file, decomposed))
         val wrong = assertThrows(UserInputException::class.java) { BackupFile.decrypt(file, "yanlış-parola-123") }
         assertTrue(wrong.message!!.contains("Parola yanlış"))
+        val empty = assertThrows(UserInputException::class.java) { BackupFile.decrypt(file, "") }
+        assertTrue(empty.message!!.contains("Parola yanlış"))
         assertThrows(UserInputException::class.java) { BackupFile.decrypt("{\"hello\":1}".toByteArray(), "enestv-fixture-parola") }
+    }
+
+    // Reverse direction: a backup encrypted by this core must open on Windows (EnesTV.Tests decrypts the same file).
+    // Regenerate with: gradlew :core:test -PgenerateFixtures=true (then review the diff).
+    @Test
+    fun androidSampleFixture() {
+        @Suppress("UNCHECKED_CAST")
+        val expected = read("backup/sample.expected.json") as Map<String, Any?>
+        val file = File(root, "backup/sample-android.enestv")
+        if (System.getProperty("enestv.generateFixtures") == "true") file.writeBytes(BackupFile.encrypt(expected, "enestv-fixture-parola", 10_000))
+        assertEquals(expected, BackupFile.decrypt(file.readBytes(), "enestv-fixture-parola"))
+    }
+
+    @Test
+    fun backupRoundTripsAndChecksPassphrase() {
+        @Suppress("UNCHECKED_CAST")
+        val payload = read("backup/sample.expected.json") as Map<String, Any?>
+        val file = BackupFile.encrypt(payload, "Şifre-Ğüç-2026", 10_000)
+        assertEquals(payload, BackupFile.decrypt(file, java.text.Normalizer.normalize("Şifre-Ğüç-2026", java.text.Normalizer.Form.NFD)))
+        assertEquals(BackupFile.channels(payload).size, 2)
+        assertThrows(UserInputException::class.java) { BackupFile.encrypt(payload, "kısa", 10_000) }
+        // Types survive: the Windows reader rejects "75" for a number or "true" for a boolean.
+        val text = Json.write(payload)
+        assertTrue(text.contains("\"defaultVolume\":") && !text.contains("\"defaultVolume\":\""))
     }
 
     @Test

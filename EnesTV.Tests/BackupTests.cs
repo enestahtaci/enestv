@@ -84,11 +84,15 @@ public sealed class BackupTests
         Assert.NotEqual(composed, decomposed);
         Assert.Equal(exported.Sources.Count, BackupFile.Decrypt(BackupFile.Encrypt(exported, composed, FastIterations), decomposed).Sources.Count);
     }
-    // Cross-platform fixture: every platform must open fixtures/backup/sample.enestv with this passphrase.
-    [Fact] public void SampleFixtureDecrypts()
+    // Cross-platform fixtures: every platform must open both files with this passphrase. sample.enestv is written by
+    // this (Windows) core, sample-android.enestv by the Android core (android/core); both hold sample.expected.json.
+    [Theory]
+    [InlineData("sample.enestv")]
+    [InlineData("sample-android.enestv")]
+    public void SampleFixtureDecrypts(string file)
     {
         var root = Path.Combine(AppContext.BaseDirectory, "fixtures", "backup");
-        var backup = BackupFile.Decrypt(File.ReadAllBytes(Path.Combine(root, "sample.enestv")), "enestv-fixture-parola");
+        var backup = BackupFile.Decrypt(File.ReadAllBytes(Path.Combine(root, file)), "enestv-fixture-parola");
         var expected = JsonNode.Parse(File.ReadAllText(Path.Combine(root, "sample.expected.json")));
         var actual = JsonSerializer.SerializeToNode(backup, BackupFile.PayloadJson);
         Assert.True(JsonNode.DeepEquals(expected, actual), actual?.ToJsonString());

@@ -37,6 +37,44 @@ object Json {
         append('"')
     }
 
+    /**
+     * Serializes a tree made of Map (string keys, order kept), List, String, JsonNumber, Int/Long, Boolean and null.
+     * Numbers stay numbers and booleans stay booleans: the Windows backup reader is strict about JSON types.
+     */
+    fun write(value: Any?): String = StringBuilder().also { write(value, it) }.toString()
+
+    private fun write(value: Any?, out: StringBuilder) {
+        when (value) {
+            null -> out.append("null")
+            is String -> out.append(quote(value))
+            is JsonNumber -> out.append(value.text)
+            is Int, is Long -> out.append(value.toString())
+            is Boolean -> out.append(if (value) "true" else "false")
+            is Map<*, *> -> {
+                out.append('{')
+                var first = true
+                for ((k, v) in value) {
+                    if (!first) out.append(',')
+                    first = false
+                    out.append(quote(k as String)).append(':')
+                    write(v, out)
+                }
+                out.append('}')
+            }
+            is Iterable<*> -> {
+                out.append('[')
+                var first = true
+                for (v in value) {
+                    if (!first) out.append(',')
+                    first = false
+                    write(v, out)
+                }
+                out.append(']')
+            }
+            else -> throw IllegalArgumentException("not a JSON value: ${value.javaClass.simpleName}")
+        }
+    }
+
     /** Writes a JSON object from string fields (null values become JSON null). */
     fun obj(vararg fields: Pair<String, String?>): String =
         fields.joinToString(",", "{", "}") { (k, v) -> quote(k) + ":" + (v?.let(::quote) ?: "null") }

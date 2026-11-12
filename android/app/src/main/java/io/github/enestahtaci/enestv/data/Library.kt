@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.os.SystemClock
 import android.util.Log
 import io.github.enestahtaci.enestv.core.AuthenticationException
+import io.github.enestahtaci.enestv.core.BackupFile
 import io.github.enestahtaci.enestv.core.Channel
 import io.github.enestahtaci.enestv.core.ChannelSnapshot
 import io.github.enestahtaci.enestv.core.Json
@@ -217,6 +218,106 @@ class Library private constructor(private val context: Context, private val cryp
         } finally {
             db.endTransaction()
         }
+    }
+
+    // ---- backup (CORE-SPEC §6a) ----
+
+    /** The whole library as the backup payload tree (sources with secrets, channels, user data). */
+    fun exportPayload(appVersion: String): Map<String, Any?> {
+        val sources = sources()
+        val progress = db.rawQuery("SELECT value FROM progress", null).use { c ->
+            buildList { while (c.moveToNext()) add(Json.parse(crypto.openText(c.getBlob(0)))) }
+        }
+        return linkedMapOf(
+            "version" to BackupFile.VERSION,
+            "created" to BackupFile.now(),
+            "appVersion" to appVersion,
+            "sources" to sources.map { s ->
+                linkedMapOf("id" to s.id, "name" to s.name, "kind" to s.kind.backupName, "location" to s.location,
+                    "username" to s.username, "password" to s.password, "updated" to s.updated?.let(BackupFile::isoTime))
+            },
+            "channels" to channels(sources).map(BackupFile::channelTree),
+            "favorites" to favorites().toList(),
+            "recent" to recent(),
+            "settings" to (readTree("settings") ?: BackupFile.defaultSettings()),
+            "layout" to (readTree("layout") ?: BackupFile.emptyLayout()),
+            "progress" to progress,
+        )
+    }
+
+    data class RestoreSummary(val sources: Int, val skippedSources: Int, val channels: Int, val favorites: Int)
+
+    fun summarize(payload: Map<*, *>): RestoreSummary {
+        val all = BackupFile.sources(payload)
+        val supported = all.filter { Source.Kind.fromBackup(it.kind) != null }.map { it.id }.toSet()
+        val channels = BackupFile.channels(payload).filter { it.sourceId in supported }
+        val keys = channels.mapTo(HashSet()) { it.id }
+        return RestoreSummary(supported.size, all.size - supported.size, channels.size, BackupFile.strings(payload, "favorites").count { it in keys })
+    }
+
+    /**
+     * Replaces the whole library with the backup (CORE-SPEC §6a): a local safety copy first, then sources, channels,
+     * favorites and recent (only for channels in the backup), settings, layout and progress (only for its sources).
+     * Sources this version cannot open (local M3U files) are skipped. Returns the safety copy folder.
+     */
+    fun restore(payload: Map<*, *>): File {
+        val safety = safetyCopy()
+        val sources = BackupFile.sources(payload).mapNotNull { s ->
+            val kind = Source.Kind.fromBackup(s.kind) ?: return@mapNotNull null
+            Source(s.id, s.name, kind, if (kind == Source.Kind.XTREAM) Xtream.normalizeServer(s.location) else s.location,
+                s.username, s.password, BackupFile.epochMs(s.updated))
+        }
+        val ids = sources.mapTo(HashSet()) { it.id }
+        val channels = BackupFile.channels(payload).filter { it.sourceId in ids }
+        val keys = channels.mapTo(HashSet()) { it.id }
+
+        db.beginTransaction()
+        try {
+            for (table in listOf("sources", "favorites", "recent", "settings", "layout", "progress")) db.delete(table, null, null)
+            sources.forEach(::saveSource)
+            val now = System.currentTimeMillis()
+            for (key in BackupFile.strings(payload, "favorites")) if (key in keys) setFavorite(key, true)
+            BackupFile.strings(payload, "recent").filter { it in keys }.take(RECENT_LIMIT).forEachIndexed { i, key ->
+                db.insertWithOnConflict("recent", null, ContentValues().apply { put("channel_id", key); put("watched", now - i) }, SQLiteDatabase.CONFLICT_IGNORE)
+            }
+            (payload["settings"] as? Map<*, *>)?.let { writeTree("settings", it) }
+            (payload["layout"] as? Map<*, *>)?.let { writeTree("layout", it) }
+            for (p in (payload["progress"] as? List<*>).orEmpty()) {
+                val sourceId = Json.text(p, "sourceId"); val key = Json.text(p, "key")
+                if (sourceId in ids && key.isNotEmpty()) {
+                    db.insertWithOnConflict("progress", null, ContentValues().apply {
+                        put("source_id", sourceId); put("item_key", key); put("value", crypto.sealText(Json.write(p)))
+                    }, SQLiteDatabase.CONFLICT_REPLACE)
+                }
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+        channelDir.listFiles()?.forEach { it.delete() }
+        for ((sourceId, list) in channels.groupBy { it.sourceId }) writeSnapshot(sourceId, list)
+        return safety
+    }
+
+    /** Copies the database and channel files to files/backups/before-restore-<time>; keeps the newest three copies. */
+    private fun safetyCopy(): File {
+        val root = File(context.filesDir, "backups").apply { mkdirs() }
+        val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.ROOT).format(java.util.Date())
+        val target = File(root, "before-restore-$stamp").apply { mkdirs() }
+        db.rawQuery("PRAGMA wal_checkpoint(FULL)", null).use { it.moveToFirst() }
+        context.getDatabasePath("library.db").copyTo(File(target, "library.db"), overwrite = true)
+        channelDir.listFiles()?.forEach { it.copyTo(File(target, "channels/${it.name}"), overwrite = true) }
+        // The data key that encrypts these copies stays on this device (Keystore), so they are only usable here.
+        root.listFiles()?.filter { it.isDirectory }?.sortedByDescending { it.name }?.drop(3)?.forEach { it.deleteRecursively() }
+        return target
+    }
+
+    private fun readTree(table: String): Map<*, *>? = db.rawQuery("SELECT value FROM $table WHERE id=1", null).use { c ->
+        if (c.moveToFirst()) Json.parse(crypto.openText(c.getBlob(0))) as? Map<*, *> else null
+    }
+
+    private fun writeTree(table: String, value: Map<*, *>) {
+        db.insertWithOnConflict(table, null, ContentValues().apply { put("id", 1); put("value", crypto.sealText(Json.write(value))) }, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
     // ---- spike data (single source in SharedPreferences, downloads kept as cache) ----

@@ -169,7 +169,7 @@ Başlık yoksa `İsimsiz program`, açıklama yoksa boş. Eşleştirme kanalın 
 - Açılışta liste dosyadan gösterilir; son başarılı yenilemesi 12 saatten eski (veya hiç yüklenmemiş) kaynaklar arka
   planda sırayla yenilenir. Android yedeği ve cihaz aktarımı kapalıdır.
 
-## 6a. Yedek (`.enestv`, fixture: `backup/sample.enestv`, parola `enestv-fixture-parola`)
+## 6a. Yedek (`.enestv`, fixture: `backup/sample.enestv` ve `backup/sample-android.enestv`, parola `enestv-fixture-parola`)
 
 Yedek, cihazlar ve platformlar arasında taşınabilen tek dosyadır ve **her zaman parolayla şifrelenir**: kaynak
 bilgileri, M3U/EPG adresleri ve Xtream kanal adresleri (`/live/{u}/{p}/…`) hesap bilgisi taşır.
@@ -198,9 +198,14 @@ bilgileri, M3U/EPG adresleri ve Xtream kanal adresleri (`/live/{u}/{p}/…`) hes
 `positionMs`, `durationMs`, `completed`, `updated`). Film/dizi kataloğu önbelleği ve TV rehberi yedeğe girmez.
 
 **Geri yükleme** tamamen değiştirir: önce mevcut kütüphanenin yerel güvenlik kopyası alınır (Windows:
-`%LOCALAPPDATA%\enestv\backups\library-before-restore-*.db`), sonra tek işlemde kaynaklar ve bağlı her şey silinip
+`%LOCALAPPDATA%\enestv\backups\library-before-restore-*.db`; Android: uygulama klasöründe
+`backups/before-restore-*`, en yeni üç kopya), sonra tek işlemde kaynaklar ve bağlı her şey silinip
 yedektekiler yazılır. Favori ve son izlenenler yalnızca yedekteki kanallar için, izleme konumları yalnızca yedekteki
-kaynaklar için yazılır. TV rehberi korunur.
+kaynaklar için yazılır. TV rehberi korunur. Platformun açamadığı kaynak türleri (Android'de yerel M3U dosyası) ve
+onların kanalları atlanır; onay penceresi bunu söyler.
+
+**Yazarken türler korunur:** sayılar JSON sayısı, mantıksal değerler `true`/`false`, zamanlar ISO-8601 (ör.
+`2026-11-12T18:21:00Z`), boş değerler `null`. Windows okuyucusu `"75"` gibi metne çevrilmiş sayıları kabul etmez.
 
 ## 7. İzleme konumu
 

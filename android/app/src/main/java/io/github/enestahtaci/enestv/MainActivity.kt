@@ -125,7 +125,9 @@ class MainActivity : Activity(), LivePlayer.Listener {
             }
             val stored = library.channels(sources)
             val ms = SystemClock.elapsedRealtime() - t0
-            Log.i(PERF_TAG, "stored list loaded in ${ms}ms, channels=${stored.size}, sources=${sources.size}")
+            val keys = stored.mapTo(HashSet()) { it.id }
+            Log.i(PERF_TAG, "stored list loaded in ${ms}ms, channels=${stored.size}, sources=${sources.size}, " +
+                "favorites=${library.favorites().count { it in keys }}, recent=${library.recent().count { it in keys }}")
             if (stored.isNotEmpty()) main.post { if (generation == loadGeneration) show(stored, "${stored.size} kanal · ${sources.size} kaynak") }
 
             val now = System.currentTimeMillis()

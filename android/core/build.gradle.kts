@@ -23,5 +23,6 @@ tasks.test {
     // Shared, language-neutral test data at the repository root (fixtures/README.md).
     val fixtures = rootProject.file("../fixtures")
     systemProperty("enestv.fixtures", fixtures.absolutePath)
+    systemProperty("enestv.generateFixtures", providers.gradleProperty("generateFixtures").getOrElse("false"))
     inputs.dir(fixtures)
 }
