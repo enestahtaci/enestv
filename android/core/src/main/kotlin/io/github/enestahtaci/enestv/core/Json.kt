@@ -22,6 +22,25 @@ object Json {
         else -> ""
     }
 
+    /** A JSON string literal. */
+    fun quote(s: String): String = buildString(s.length + 2) {
+        append('"')
+        for (c in s) when {
+            c == '"' -> append("\\\"")
+            c == '\\' -> append("\\\\")
+            c == '\n' -> append("\\n")
+            c == '\r' -> append("\\r")
+            c == '\t' -> append("\\t")
+            c < ' ' -> append("\\u").append(String.format("%04x", c.code))
+            else -> append(c)
+        }
+        append('"')
+    }
+
+    /** Writes a JSON object from string fields (null values become JSON null). */
+    fun obj(vararg fields: Pair<String, String?>): String =
+        fields.joinToString(",", "{", "}") { (k, v) -> quote(k) + ":" + (v?.let(::quote) ?: "null") }
+
     class JsonException(message: String) : Exception(message)
 
     private class Reader(val s: String) {

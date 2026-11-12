@@ -63,6 +63,12 @@
         android:visibility="gone" />
 
     <EditText
+        android:id="@+id/sourceName"
+        style="@style/Enestv.Field"
+        android:hint="@string/source_name_hint"
+        android:inputType="text|textCapSentences" />
+
+    <EditText
         android:id="@+id/m3uUrl"
         style="@style/Enestv.Field"
         android:hint="@string/m3u_url_hint"

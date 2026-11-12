@@ -32,6 +32,10 @@
         </activity>
 
         <activity
+            android:name=".SourcesActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".SourceActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />

@@ -99,6 +99,17 @@ class FixtureTests {
         assertTrue(!stream.hasNext())
     }
 
+    @Test
+    fun channelSnapshotRoundTrips() {
+        val channels = listOf(
+            Channel("A1", "src", "ŞİMDİ TV", "http://example.invalid/1", "t1", "ŞİMDİ", "", "Haber"),
+            Channel("B2", "src", "", "rtmp://example.invalid/2", category = "Haber"),
+        )
+        assertEquals(channels, io.github.enestahtaci.enestv.core.ChannelSnapshot.decode(io.github.enestahtaci.enestv.core.ChannelSnapshot.encode(channels)))
+        assertEquals(emptyList<Channel>(), io.github.enestahtaci.enestv.core.ChannelSnapshot.decode(io.github.enestahtaci.enestv.core.ChannelSnapshot.encode(emptyList())))
+        assertThrows(java.io.IOException::class.java) { io.github.enestahtaci.enestv.core.ChannelSnapshot.decode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8)) }
+    }
+
     // Large account: 30,000 channels (≈ 10 MB of JSON) through the streaming parser.
     @Test
     fun xtreamLargeAccountStreams() {

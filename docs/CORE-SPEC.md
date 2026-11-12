@@ -160,6 +160,15 @@ Başlık yoksa `İsimsiz program`, açıklama yoksa boş. Eşleştirme kanalın 
 - Şifreleme anahtarları cihaza bağlıdır (Windows: DPAPI). Veri bir cihazdan diğerine veritabanı kopyalanarak
   taşınamaz; bunun için yedek dosyası kullanılır (6a).
 
+**Platform notu — Android.** Saklama biçimi platforma özeldir; ortak sözleşme yedek (6a) ve anahtarlardır (1).
+- Rastgele 256 bitlik bir veri anahtarı uygulama içinde AES-GCM ile şifreler; veri anahtarı Android Keystore'daki
+  dışarı çıkarılamaz bir anahtarla sarılı saklanır (Keystore çağrısı açılışta bir kez; kayıt başına Keystore
+  çağrısı binlerce kanalda dakikalar sürerdi).
+- Kanal listesi kaynak başına tek şifreli dosyadır (`ChannelSnapshot`); kaynaklar (bilgiler şifreli), favoriler, son
+  izlenenler, ayarlar, kanal düzeni ve izleme konumları SQLite'tadır. Ham indirmeler ayrıştırmadan sonra silinir.
+- Açılışta liste dosyadan gösterilir; son başarılı yenilemesi 12 saatten eski (veya hiç yüklenmemiş) kaynaklar arka
+  planda sırayla yenilenir. Android yedeği ve cihaz aktarımı kapalıdır.
+
 ## 6a. Yedek (`.enestv`, fixture: `backup/sample.enestv`, parola `enestv-fixture-parola`)
 
 Yedek, cihazlar ve platformlar arasında taşınabilen tek dosyadır ve **her zaman parolayla şifrelenir**: kaynak

@@ -29,22 +29,18 @@ import io.github.enestahtaci.enestv.core.AuthenticationException
 import io.github.enestahtaci.enestv.core.Channel
 import io.github.enestahtaci.enestv.core.FoldedIndex
 import io.github.enestahtaci.enestv.core.UserInputException
-import io.github.enestahtaci.enestv.data.ChannelLibrary
-import io.github.enestahtaci.enestv.data.Source
-import io.github.enestahtaci.enestv.data.SourceStore
+import io.github.enestahtaci.enestv.data.Library
 import io.github.enestahtaci.enestv.playback.LivePlayer
 import java.util.concurrent.Executors
 
 /**
- * Spike step 3: real source, playback and channel switching. OK plays the focused channel, OK on the playing channel
+ * Live TV: all sources' channels, playback and channel switching. OK plays the focused channel, OK on the playing channel
  * goes fullscreen; CH+/CH- (and up/down in fullscreen) switch channels; Back leaves fullscreen.
  * Logged under [PERF_TAG]: start, list load, search and zap times (never URLs or account details).
  */
 class MainActivity : Activity(), LivePlayer.Listener {
     private val io = Executors.newSingleThreadExecutor()
     private val main = Handler(Looper.getMainLooper())
-    private lateinit var store: SourceStore
-    private lateinit var library: ChannelLibrary
     private lateinit var player: LivePlayer
     private lateinit var adapter: ChannelAdapter
     private lateinit var list: RecyclerView
@@ -68,8 +64,6 @@ class MainActivity : Activity(), LivePlayer.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        store = SourceStore(this)
-        library = ChannelLibrary(filesDir)
         list = findViewById(R.id.channels)
         status = findViewById(R.id.status)
         playerStatus = findViewById(R.id.playerStatus)
@@ -87,7 +81,7 @@ class MainActivity : Activity(), LivePlayer.Listener {
             if (focusFirstRowAfterLayout) list.getChildAt(0)?.let { focusFirstRowAfterLayout = false; it.requestFocus() }
         }
 
-        findViewById<View>(R.id.sourceButton).setOnClickListener { openSource() }
+        findViewById<View>(R.id.sourceButton).setOnClickListener { openSources() }
         search.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
@@ -99,57 +93,62 @@ class MainActivity : Activity(), LivePlayer.Listener {
             Log.i(PERF_TAG, "first frame after ${SystemClock.uptimeMillis() - Process.getStartUptimeMillis()}ms")
             reportFullyDrawn()
         }
-        loadLibrary(refresh = true)
+        loadLibrary()
     }
 
-    private fun openSource() {
-        @Suppress("DEPRECATION") // platform Activity API; no AndroidX activity dependency in the spike
-        startActivityForResult(Intent(this, SourceActivity::class.java), REQUEST_SOURCE)
+    private fun openSources() {
+        @Suppress("DEPRECATION") // platform Activity API; no AndroidX activity dependency
+        startActivityForResult(Intent(this, SourcesActivity::class.java), REQUEST_SOURCES)
     }
 
     @Deprecated("platform Activity API")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         @Suppress("DEPRECATION") super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_SOURCE && resultCode == RESULT_OK) {
-            stopPlayback()
-            io.execute { library.clearCache() }
-            loadLibrary(refresh = true)
-        }
+        if (requestCode == REQUEST_SOURCES && resultCode == RESULT_OK) loadLibrary()
     }
 
-    /** Shows cached channels at once, then refreshes from the network in the background. */
-    private fun loadLibrary(refresh: Boolean) {
+    /**
+     * Shows the stored channels at once, then refreshes in the background every source that was never loaded or is
+     * older than [STALE_MS]. Sources are refreshed one at a time (providers limit parallel connections).
+     */
+    private fun loadLibrary() {
         val generation = ++loadGeneration
         status.text = "Yükleniyor…"
         io.execute {
-            val source = store.load()
-            if (source == null) {
-                main.post { if (generation == loadGeneration) { status.text = "Kaynak eklenmedi."; openSource() } }
+            val t0 = SystemClock.elapsedRealtime()
+            val library = Library.get(this)
+            library.migrateLegacy()
+            val sources = library.sources()
+            if (sources.isEmpty()) {
+                main.post { if (generation == loadGeneration) { show(emptyList(), "Kaynak eklenmedi."); openSources() } }
                 return@execute
             }
-            val t0 = SystemClock.elapsedRealtime()
-            val cached = runCatching { library.loadCached(source) }.getOrNull()
-            if (cached != null) {
-                val ms = SystemClock.elapsedRealtime() - t0
-                Log.i(PERF_TAG, "cached list parsed in ${ms}ms, channels=${cached.size}")
-                main.post { if (generation == loadGeneration) show(cached, "${cached.size} kanal (kayıtlı liste, $ms ms) · yenileniyor…") }
-            }
-            if (!refresh) return@execute
-            val t1 = SystemClock.elapsedRealtime()
-            try {
-                val fresh = library.refresh(source)
-                val ms = SystemClock.elapsedRealtime() - t1
-                Log.i(PERF_TAG, "refresh (download+parse) in ${ms}ms, channels=${fresh.size}")
-                main.post { if (generation == loadGeneration) show(fresh, "${fresh.size} kanal · güncellendi ($ms ms)") }
-            } catch (e: Exception) {
-                val message = when (e) {
-                    is AuthenticationException -> "Kullanıcı adı veya parola kabul edilmedi."
-                    is UserInputException -> e.message
-                    else -> "Kaynak yüklenemedi; bağlantıyı kontrol edin."
+            val stored = library.channels(sources)
+            val ms = SystemClock.elapsedRealtime() - t0
+            Log.i(PERF_TAG, "stored list loaded in ${ms}ms, channels=${stored.size}, sources=${sources.size}")
+            if (stored.isNotEmpty()) main.post { if (generation == loadGeneration) show(stored, "${stored.size} kanal · ${sources.size} kaynak") }
+
+            val now = System.currentTimeMillis()
+            val stale = sources.filter { !library.hasChannels(it.id) || (it.updated ?: 0) < now - STALE_MS }
+            if (stale.isEmpty()) return@execute
+            val problems = ArrayList<String>()
+            for (source in stale) {
+                if (generation != loadGeneration) return@execute
+                main.post { if (generation == loadGeneration && channels.isEmpty()) status.text = "${source.name} yükleniyor…" }
+                try {
+                    library.refresh(source)
+                } catch (e: Exception) {
+                    Log.w(PERF_TAG, "refresh failed: ${e.javaClass.simpleName}")
+                    problems += "${source.name}: " + when (e) {
+                        is AuthenticationException -> "kullanıcı adı veya parola kabul edilmedi."
+                        is UserInputException -> e.message
+                        else -> "yüklenemedi; bağlantıyı kontrol edin."
+                    }
                 }
-                Log.w(PERF_TAG, "refresh failed: ${e.javaClass.simpleName}")
-                main.post { if (generation == loadGeneration) status.text = if (cached != null) "${cached.size} kanal (kayıtlı) · $message" else message }
             }
+            val fresh = library.channels()
+            val text = "${fresh.size} kanal · ${sources.size} kaynak" + if (problems.isEmpty()) " · güncellendi" else "\n" + problems.joinToString("\n")
+            main.post { if (generation == loadGeneration) show(fresh, text) }
         }
     }
 
@@ -190,6 +189,7 @@ class MainActivity : Activity(), LivePlayer.Listener {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         showPlayerStatus("${channelNumber(channel)}  ${c.name}\nAçılıyor…")
         player.play(c.url)
+        io.execute { Library.get(this).addRecent(c.id) }
     }
 
     /** Next/previous channel within the current (possibly filtered) list. */
@@ -340,6 +340,9 @@ class MainActivity : Activity(), LivePlayer.Listener {
 
     companion object {
         const val PERF_TAG = "enestv.perf"
-        private const val REQUEST_SOURCE = 1
+        private const val REQUEST_SOURCES = 1
+
+        /** A source is refreshed on start when its last successful refresh is older than this. */
+        private const val STALE_MS = 12 * 60 * 60 * 1000L
     }
 }
